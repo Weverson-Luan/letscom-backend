@@ -9,6 +9,7 @@ use App\Http\Controllers\CreditSaleController;
 use App\Http\Controllers\RemessaController;
 use App\Http\Middleware\RateLimitPerUser;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ModeloTecnicoController;
 
 /**
  * Rotas da API do Sistema de Gerenciamento de Créditos
@@ -92,6 +93,14 @@ Route::middleware(['auth.jwt'])->group(function () {
         Route::get('/{remessa}', [RemessaController::class, 'show'])->middleware('permission:remessas,R');
         Route::put('/{remessa}', [RemessaController::class, 'update'])->middleware('permission:remessas,U');
         Route::delete('/{remessa}', [RemessaController::class, 'destroy'])->middleware('permission:remessas,D');
+    });
+
+    Route::prefix('modelo-tecnico')->group(function () {
+        Route::get('/', [ModeloTecnicoController::class, 'index']);
+        Route::post('/', [ModeloTecnicoController::class, 'store']);
+        Route::get('/{id}', [ModeloTecnicoController::class, 'show']);
+        Route::put('/{id}', [ModeloTecnicoController::class, 'update']);
+        Route::delete('/{id}', [ModeloTecnicoController::class, 'destroy']);
     });
 
     /**
