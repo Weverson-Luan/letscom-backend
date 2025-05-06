@@ -1,0 +1,107 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Services\CreditSaleService;
+use App\Models\CreditSale;
+use Illuminate\Http\Request;
+use App\Http\Requests\CreditSaleRequest;
+use Illuminate\Http\JsonResponse;
+
+/**
+ * Controller para gerenciamento de Vendas de Créditos
+ * 
+ * @package App\Http\Controllers
+ * @version 1.0.0
+ */
+class CreditSaleController extends Controller
+{
+    /** @var CreditSaleService */
+    protected $service;
+
+    /**
+     * Construtor do controller
+     * 
+     * @param CreditSaleService $service Serviço de vendas
+     */
+    public function __construct(CreditSaleService $service)
+    {
+        $this->service = $service;
+    }
+
+    /**
+     * Lista vendas com paginação
+     * 
+     * @param Request $request Requisição HTTP
+     * @return JsonResponse
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $result = $this->service->list($request->all());
+            return response()->json($result);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Cria uma nova venda
+     * 
+     * @param CreditSaleRequest $request Requisição validada
+     * @return JsonResponse
+     */
+    public function store(CreditSaleRequest $request): JsonResponse
+    {
+        try {
+            $sale = $this->service->create($request->validated());
+            return response()->json($sale, 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Exibe uma venda específica
+     * 
+     * @param CreditSale $creditSale Venda a ser exibida
+     * @return JsonResponse
+     */
+    public function show(CreditSale $creditSale): JsonResponse
+    {
+        return response()->json($creditSale->load('client'));
+    }
+
+    /**
+     * Atualiza uma venda
+     * 
+     * @param CreditSaleRequest $request Requisição validada
+     * @param CreditSale $creditSale Venda a ser atualizada
+     * @return JsonResponse
+     */
+    public function update(CreditSaleRequest $request, CreditSale $creditSale): JsonResponse
+    {
+        try {
+            $success = $this->service->update($creditSale, $request->validated());
+            return response()->json(['success' => $success]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Remove uma venda
+     * 
+     * @param CreditSale $creditSale Venda a ser removida
+     * @return JsonResponse
+     */
+    public function destroy(CreditSale $creditSale): JsonResponse
+    {
+        try {
+            $success = $this->service->delete($creditSale);
+            return response()->json(['success' => $success]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+} 
