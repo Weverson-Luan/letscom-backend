@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Log;
 
 /**
  * Serviço para gerenciamento de Remessas
- * 
+ *
  * @package App\Services
  * @version 1.0.0
  */
@@ -22,7 +22,7 @@ class RemessaService
 
     /**
      * Construtor do serviço
-     * 
+     *
      * @param RemessaRepository $repository Repositório de remessas
      */
     public function __construct(RemessaRepository $repository)
@@ -32,7 +32,7 @@ class RemessaService
 
     /**
      * Lista remessas com paginação
-     * 
+     *
      * @param array $params Parâmetros de filtro e paginação
      * @return array
      * @throws \Exception
@@ -40,15 +40,40 @@ class RemessaService
     public function list(array $params): array
     {
         try {
-            $remessas = $this->repository->paginate($params);
-            
+            $remessasPaginadas = $this->repository->paginate($params);
+
+            $data = [];
+
+            foreach ($remessasPaginadas->items() as $remessa) {
+                $cliente = \App\Models\Client::find($remessa->cliente_id);
+                $modelo = \App\Models\ModeloTecnico::find($remessa->modelo_tecnico_id);
+
+                $data[] = [
+                    'id' => $remessa->id,
+                    'total_solicitacoes' => $remessa->total_solicitacoes,
+                    'status' => $remessa->status,
+                    'data_remessa' => $remessa->data_remessa,
+                    'data_inicio_producao' => $remessa->data_inicio_producao,
+                    'tecnologia' => $remessa->tecnologia,
+                    'posicao' => $remessa->posicao,
+                    'cliente' => $cliente ?? [],
+                    'modelo_tecnico' => $modelo ?? [],
+                    'created_at' => $remessa->created_at,
+                    'updated_at' => $remessa->updated_at,
+                    'deleted_at' => $remessa->deleted_at,
+                ];
+            }
+
             return [
-                'data' => $remessas->items(),
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Remessas carregadas com sucesso!',
+                'data' => $data,
                 'pagination' => [
-                    'current_page' => $remessas->currentPage(),
-                    'last_page' => $remessas->lastPage(),
-                    'per_page' => $remessas->perPage(),
-                    'total' => $remessas->total()
+                    'current_page' => $remessasPaginadas->currentPage(),
+                    'last_page' => $remessasPaginadas->lastPage(),
+                    'per_page' => $remessasPaginadas->perPage(),
+                    'total' => $remessasPaginadas->total()
                 ]
             ];
         } catch (\Exception $e) {
@@ -56,10 +81,9 @@ class RemessaService
             throw $e;
         }
     }
-
     /**
      * Cria uma nova remessa
-     * 
+     *
      * @param array $data Dados da remessa
      * @return Remessa
      * @throws \Exception
@@ -75,7 +99,7 @@ class RemessaService
             // Calcula total de créditos e verifica estoque
             foreach ($data['items'] as $item) {
                 $product = Product::findOrFail($item['product_id']);
-                
+
                 if ($product->estoque_atual < $item['quantidade']) {
                     throw new \Exception("Produto {$product->nome} sem estoque suficiente");
                 }
@@ -99,7 +123,7 @@ class RemessaService
             // Cria os itens da remessa e atualiza estoque
             foreach ($data['items'] as $item) {
                 $product = Product::findOrFail($item['product_id']);
-                
+
                 $remessa->items()->create([
                     'product_id' => $item['product_id'],
                     'quantidade' => $item['quantidade'],
@@ -116,7 +140,7 @@ class RemessaService
             $client->save();
 
             DB::commit();
-            
+
             return $remessa->load('items.product');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -127,7 +151,7 @@ class RemessaService
 
     /**
      * Atualiza uma remessa existente
-     * 
+     *
      * @param Remessa $remessa Remessa a ser atualizada
      * @param array $data Novos dados
      * @return bool
@@ -149,7 +173,7 @@ class RemessaService
             $success = $this->repository->update($remessa, $data);
 
             DB::commit();
-            
+
             return $success;
         } catch (\Exception $e) {
             DB::rollBack();
@@ -160,7 +184,7 @@ class RemessaService
 
     /**
      * Remove uma remessa
-     * 
+     *
      * @param Remessa $remessa Remessa a ser removida
      * @return bool
      * @throws \Exception
@@ -182,7 +206,7 @@ class RemessaService
             $success = $this->repository->delete($remessa);
 
             DB::commit();
-            
+
             return $success;
         } catch (\Exception $e) {
             DB::rollBack();
@@ -193,14 +217,14 @@ class RemessaService
 
     /**
      * Processa a confirmação de uma remessa
-     * 
+     *
      * @param Remessa $remessa Remessa a ser confirmada
      * @throws \Exception
      */
     private function processarConfirmacaoRemessa(Remessa $remessa): void
     {
         $client = Client::findOrFail($remessa->client_id);
-        
+
         foreach ($remessa->items as $item) {
             $product = Product::findOrFail($item->product_id);
             if ($product->estoque_atual < $item->quantidade) {
@@ -224,13 +248,13 @@ class RemessaService
 
     /**
      * Estorna uma remessa
-     * 
+     *
      * @param Remessa $remessa Remessa a ser estornada
      */
     private function estornarRemessa(Remessa $remessa): void
     {
         $client = Client::findOrFail($remessa->client_id);
-        
+
         foreach ($remessa->items as $item) {
             $product = Product::findOrFail($item->product_id);
             $product->estoque_atual += $item->quantidade;
@@ -240,4 +264,4 @@ class RemessaService
         $client->saldo_creditos += $remessa->total_creditos;
         $client->save();
     }
-} 
+}

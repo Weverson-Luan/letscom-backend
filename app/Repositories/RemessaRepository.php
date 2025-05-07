@@ -7,7 +7,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * Repositório para gerenciamento de Remessas
- * 
+ *
  * @package App\Repositories
  * @version 1.0.0
  */
@@ -18,7 +18,7 @@ class RemessaRepository
 
     /**
      * Construtor do repositório
-     * 
+     *
      * @param Remessa $model Modelo de Remessa
      */
     public function __construct(Remessa $model)
@@ -28,7 +28,7 @@ class RemessaRepository
 
     /**
      * Lista remessas com paginação e filtros
-     * 
+     *
      * @param array $params Parâmetros de filtro e paginação
      * @return LengthAwarePaginator
      */
@@ -46,7 +46,7 @@ class RemessaRepository
 
     /**
      * Cria uma nova remessa
-     * 
+     *
      * @param array $data Dados da remessa
      * @return Remessa
      */
@@ -57,7 +57,7 @@ class RemessaRepository
 
     /**
      * Busca uma remessa pelo ID
-     * 
+     *
      * @param int $id ID da remessa
      * @return Remessa|null
      */
@@ -68,7 +68,7 @@ class RemessaRepository
 
     /**
      * Atualiza uma remessa
-     * 
+     *
      * @param Remessa $remessa Remessa a ser atualizada
      * @param array $data Novos dados
      * @return bool
@@ -80,7 +80,7 @@ class RemessaRepository
 
     /**
      * Remove uma remessa
-     * 
+     *
      * @param Remessa $remessa Remessa a ser removida
      * @return bool
      */
@@ -88,4 +88,4 @@ class RemessaRepository
     {
         return $remessa->delete();
     }
-} 
+}

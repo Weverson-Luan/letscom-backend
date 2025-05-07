@@ -2,20 +2,21 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Services\ModeloTecnicoService;
+use App\Services\ModeloTecnicosService;
 
-class ModeloTecnicoController extends Controller
+class ModeloTecnicosController extends Controller
 {
     protected $service;
 
-    public function __construct(ModeloTecnicoService $service)
+    public function __construct(ModeloTecnicosService $service)
     {
         $this->service = $service;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json($this->service->all());
+
+        return response()->json($this->service->list($request->all()));
     }
 
     public function store(Request $request)

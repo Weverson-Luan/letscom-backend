@@ -16,10 +16,12 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,        // Primeiro usuários (para autenticação)
             ClientSeeder::class,      // Depois clientes (necessário para vendas)
+            ModelosTecnicosSeeder::class, // modelo do cliente
             ProductSeeder::class,     // Produtos (necessário para remessas)
-            CreditSaleSeeder::class,  // Vendas de créditos
             RemessaSeeder::class,     // Remessas
-            RemessaItemSeeder::class  // Itens das remessas
+            RemessaItemSeeder::class,  // Itens das remessas
+            CreditSaleSeeder::class,  // Vendas de créditos
+            ModelosTecnicosCamposVariaveisSeeder::class
         ]);
     }
 }

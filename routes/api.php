@@ -9,7 +9,9 @@ use App\Http\Controllers\CreditSaleController;
 use App\Http\Controllers\RemessaController;
 use App\Http\Middleware\RateLimitPerUser;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\ModeloTecnicoController;
+use App\Http\Controllers\ModeloTecnicosController;
+use App\Http\Controllers\ModelosTecnicosCamposVariaveisController;
+use App\Http\Controllers\RemessaFotoController;
 
 /**
  * Rotas da API do Sistema de Gerenciamento de Créditos
@@ -90,18 +92,31 @@ Route::middleware(['auth.jwt'])->group(function () {
     Route::prefix('remessas')->group(function () {
         Route::get('/', [RemessaController::class, 'index'])->middleware('permission:remessas,R');
         Route::post('/', [RemessaController::class, 'store'])->middleware('permission:remessas,C');
+        Route::post('/{remessa}/upload-fotos', [RemessaFotoController::class, 'store']);
         Route::get('/{remessa}', [RemessaController::class, 'show'])->middleware('permission:remessas,R');
         Route::put('/{remessa}', [RemessaController::class, 'update'])->middleware('permission:remessas,U');
         Route::delete('/{remessa}', [RemessaController::class, 'destroy'])->middleware('permission:remessas,D');
     });
 
     Route::prefix('modelo-tecnico')->group(function () {
-        Route::get('/', [ModeloTecnicoController::class, 'index']);
-        Route::post('/', [ModeloTecnicoController::class, 'store']);
-        Route::get('/{id}', [ModeloTecnicoController::class, 'show']);
-        Route::put('/{id}', [ModeloTecnicoController::class, 'update']);
-        Route::delete('/{id}', [ModeloTecnicoController::class, 'destroy']);
+        Route::get('/', [ModeloTecnicosController::class, 'index']);
+        Route::post('/', [ModeloTecnicosController::class, 'store']);
+        Route::get('/{id}', [ModeloTecnicosController::class, 'show']);
+        Route::put('/{id}', [ModeloTecnicosController::class, 'update']);
+        Route::delete('/{id}', [ModeloTecnicosController::class, 'destroy']);
     });
+
+
+
+    Route::prefix('modelos-tecnicos-campos-variaveis')->group(function () {
+        Route::get('/', [ModelosTecnicosCamposVariaveisController::class, 'index']);
+        Route::get('/{id}', [ModelosTecnicosCamposVariaveisController::class, 'show']);
+    });
+
+
+
+
+
 
     /**
      * Rotas de Usuários
