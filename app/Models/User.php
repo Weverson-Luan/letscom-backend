@@ -16,9 +16,9 @@ class User extends Authenticatable
     use Notifiable;
 
     protected $table = 'users';
-    protected $primaryKey = 'cpf';
-    public $incrementing = false;
-    protected $keyType = 'string';
+    protected $primaryKey = 'id';
+    public $incrementing = true;
+    protected $keyType = 'int';
     public $timestamps = true;
 
     /**
@@ -30,8 +30,10 @@ class User extends Authenticatable
         'nome',
         'email',
         'senha',
-        'permissao_usuario',
-        'cpf',
+        "ativo",
+        'documento',
+        'tipo_pessoa',
+        "telefone"
     ];
 
     /**
@@ -86,7 +88,7 @@ class User extends Authenticatable
         $permissaoCRUD = $permissionMap[$permissao] ?? $permissao;
 
         $temPermissao = str_contains($this->permissoes[$modulo], $permissaoCRUD);
-        
+
         Log::info('Resultado da verificação:', [
             'tem_permissao' => $temPermissao,
             'permissao_procurada' => $permissaoCRUD,
@@ -156,4 +158,9 @@ class User extends Authenticatable
     {
         return $this->senha;
     }
+
+    public function roles(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+{
+    return $this->belongsToMany(Role::class, 'role_user', 'user_id', 'role_id');
+}
 }

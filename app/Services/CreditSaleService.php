@@ -4,13 +4,12 @@ namespace App\Services;
 
 use App\Repositories\CreditSaleRepository;
 use App\Models\CreditSale;
-use App\Models\Client;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
  * Serviço para gerenciamento de Vendas de Créditos
- * 
+ *
  * @package App\Services
  * @version 1.0.0
  */
@@ -21,7 +20,7 @@ class CreditSaleService
 
     /**
      * Construtor do serviço
-     * 
+     *
      * @param CreditSaleRepository $repository Repositório de vendas
      */
     public function __construct(CreditSaleRepository $repository)
@@ -31,7 +30,7 @@ class CreditSaleService
 
     /**
      * Lista vendas com paginação
-     * 
+     *
      * @param array $params Parâmetros de filtro e paginação
      * @return array
      * @throws \Exception
@@ -40,7 +39,7 @@ class CreditSaleService
     {
         try {
             $sales = $this->repository->paginate($params);
-            
+
             return [
                 'data' => $sales->items(),
                 'pagination' => [
@@ -56,40 +55,45 @@ class CreditSaleService
         }
     }
 
-    /**
-     * Cria uma nova venda de créditos
-     * 
-     * @param array $data Dados da venda
-     * @return CreditSale
-     * @throws \Exception
-     */
-    public function create(array $data): CreditSale
-    {
-        try {
-            DB::beginTransaction();
+public function create(array $data): CreditSale
+{
+    try {
+        DB::beginTransaction();
 
-            $data['status'] = 'confirmado';
-            $data['data_venda'] = now();
+        $data['status'] = 'confirmado';
+        $data['data_venda'] = now();
 
-            $sale = $this->repository->create($data);
+        // ✅ Atualiza estoque do produto se fornecido produto_id
+        if (!empty($data['produto_id']) && isset($data['quantidade_creditos'])) {
+            $produto = \App\Models\Product::findOrFail($data['produto_id']);
 
-            $client = Client::findOrFail($data['client_id']);
-            $client->saldo_creditos = ($client->saldo_creditos ?? 0) + $data['quantidade_creditos'];
-            $client->save();
+            $estoqueAtual = $produto->estoque_atual;
+            $quantidadeVendida = $data['quantidade_creditos'];
 
-            DB::commit();
-            
-            return $sale;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Erro ao criar venda: ' . $e->getMessage());
-            throw $e;
+            if ($quantidadeVendida > $estoqueAtual) {
+                throw new \Exception("Estoque insuficiente para o produto: {$produto->nome}");
+            }
+
+            $produto->update([
+                'estoque_atual' => $estoqueAtual - $quantidadeVendida
+            ]);
         }
-    }
 
+        // Cria a venda
+        $sale = $this->repository->create($data);
+
+        DB::commit();
+        return $sale;
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Erro ao criar venda: ' . $e->getMessage());
+        throw $e;
+    }
+}
     /**
      * Atualiza uma venda existente
-     * 
+     *
      * @param CreditSale $creditSale Venda a ser atualizada
      * @param array $data Novos dados
      * @return bool
@@ -104,7 +108,7 @@ class CreditSaleService
 
             DB::beginTransaction();
 
-            if (isset($data['quantidade_creditos']) && 
+            if (isset($data['quantidade_creditos']) &&
                 $data['quantidade_creditos'] != $creditSale->quantidade_creditos) {
                 $client = Client::findOrFail($creditSale->client_id);
                 $client->saldo_creditos = ($client->saldo_creditos - $creditSale->quantidade_creditos) + $data['quantidade_creditos'];
@@ -114,7 +118,7 @@ class CreditSaleService
             $success = $this->repository->update($creditSale, $data);
 
             DB::commit();
-            
+
             return $success;
         } catch (\Exception $e) {
             DB::rollBack();
@@ -125,7 +129,7 @@ class CreditSaleService
 
     /**
      * Remove uma venda
-     * 
+     *
      * @param CreditSale $creditSale Venda a ser removida
      * @return bool
      * @throws \Exception
@@ -148,7 +152,7 @@ class CreditSaleService
             $success = $this->repository->delete($creditSale);
 
             DB::commit();
-            
+
             return $success;
         } catch (\Exception $e) {
             DB::rollBack();
@@ -156,4 +160,4 @@ class CreditSaleService
             throw $e;
         }
     }
-} 
+}

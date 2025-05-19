@@ -11,7 +11,8 @@ class ProductSeeder extends Seeder
     {
         // Produto básico com estoque médio
         Product::create([
-            'nome' => 'Cartão RFID 13.56MHz',
+            'user_id' => 1,
+            'nome' => 'Cartão PVC',
             'tecnologia' => 'RFID',
             'valor' => 15.00,
             'valor_creditos' => 1.50,
@@ -22,7 +23,8 @@ class ProductSeeder extends Seeder
 
         // Produto premium com estoque baixo
         Product::create([
-            'nome' => 'Tag NFC Adesiva',
+            'user_id' => 1,
+            'nome' => 'Cartão Fosco',
             'tecnologia' => 'NFC',
             'valor' => 25.00,
             'valor_creditos' => 2.50,
@@ -33,7 +35,8 @@ class ProductSeeder extends Seeder
 
         // Produto empresarial com estoque alto
         Product::create([
-            'nome' => 'Cartão Dual Frequency',
+            'user_id' => 1,
+            'nome' => 'Cartão PVC adesivado',
             'tecnologia' => 'RFID/NFC',
             'valor' => 45.00,
             'valor_creditos' => 4.50,
@@ -44,7 +47,8 @@ class ProductSeeder extends Seeder
 
         // Produto econômico com estoque crítico
         Product::create([
-            'nome' => 'Tag RFID 125KHz',
+            'user_id' => 1,
+            'nome' => 'Tarja RFID 125KHz',
             'tecnologia' => 'RFID',
             'valor' => 10.00,
             'valor_creditos' => 1.00,
@@ -52,5 +56,17 @@ class ProductSeeder extends Seeder
             'estoque_maximo' => 800,
             'estoque_atual' => 120
         ]);
+
+          // Produto econômico com estoque crítico
+        Product::create([
+            'user_id' => 1,
+            'nome' => 'Chip MIFARE',
+            'tecnologia' => 'Mifare 13,56kHz',
+            'valor' => 10.00,
+            'valor_creditos' => 1.00,
+            'estoque_minimo' => 100,
+            'estoque_maximo' => 800,
+            'estoque_atual' => 120
+        ]);
     }
-} 
+}

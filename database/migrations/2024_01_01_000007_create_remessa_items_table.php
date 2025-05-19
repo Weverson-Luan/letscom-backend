@@ -10,12 +10,18 @@ return new class extends Migration
     {
         Schema::create('remessa_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('remessa_id')->constrained()->onDelete('cascade');
-            $table->foreignId('product_id')->constrained();
+
+            $table->unsignedBigInteger('remessa_id');
+            $table->unsignedBigInteger('product_id'); // Produto do item (ex: cartão Membro, Presbítero...)
+
             $table->integer('quantidade');
             $table->decimal('valor_creditos_unitario', 10, 2);
             $table->decimal('valor_creditos_total', 10, 2);
+
             $table->timestamps();
+
+            $table->foreign('remessa_id')->references('id')->on('remessas')->onDelete('cascade');
+            $table->foreign('product_id')->references('id')->on('produtos')->onDelete('cascade');
         });
     }
 
@@ -23,4 +29,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('remessa_items');
     }
-}; 
+};

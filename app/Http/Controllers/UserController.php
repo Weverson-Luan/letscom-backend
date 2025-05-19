@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\UsersResponseHelper;
+
 use App\Services\UserService;
 use App\Models\User;
-use App\Http\Requests\UserRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+
 
 class UserController extends Controller
 {
@@ -20,33 +23,83 @@ class UserController extends Controller
     {
         try {
             $result = $this->service->list($request->all());
-            return response()->json($result);
+
+
+
+            return UsersResponseHelper::jsonSuccess(
+                'Usuários carregadas com sucesso!',
+                $result['data'] ?? [],
+                $result['pagination'] ?? null,
+
+            );
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return UsersResponseHelper::jsonError($e->getMessage());
         }
     }
 
-    public function store(UserRequest $request): JsonResponse
+    public function store(Request $data): JsonResponse
     {
         try {
-            $user = $this->service->create($request->validated());
+            // Validação manual
+            $validator = validator($data->all(), [
+                'nome' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email',
+                'senha' => 'required|string|min:6',
+                'roles' => 'nullable|integer|exists:roles,id',
+            ], [
+                'email.unique'=> "Este e-mail já está em uso por outro usuário!"
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'message' => 'Erro de validação.',
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
+
+            // Verifica se o usuário já existe pelo e-mail
+            $userAlreadExists = User::where('email', $data['email'])->first();
+
+            if ($userAlreadExists) {
+                return response()->json([
+                    'message' => 'Já existe um usuário com este e-mail.'
+                ], 409); // 409 Conflict
+            }
+
+            $user = User::create([
+                'nome' => $data['nome'],
+                'email' => $data['email'],
+                'senha' => bcrypt($data['senha']),
+                'documento' => $data['documento'],
+                "ativo"=> $data['ativo'],
+                'tipo_pessoa' => $data['tipo_pessoa'],
+                "telefone"=> $data['telefone']
+            ]);
+
+            if (isset($data['roles'])) {
+                $user->roles()->sync([$data['roles']]);
+            }
+
             return response()->json($user, 201);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json([
+                'error' => 'Erro inesperado.',
+                'details' => $e->getMessage(),
+            ], 500);
         }
     }
 
     public function show(User $user): JsonResponse
     {
         try {
-            $user = $this->service->findWithPermissions($user->id);
+            // $user = $this->service->findWithPermissions($user->id);
             return response()->json($user);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
-    public function update(UserRequest $request, User $user): JsonResponse
+    public function update(Request $request, User $user): JsonResponse
     {
         try {
             $success = $this->service->update($user, $request->validated());
@@ -65,4 +118,4 @@ class UserController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-} 
+}

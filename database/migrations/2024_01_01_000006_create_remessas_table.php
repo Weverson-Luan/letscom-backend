@@ -10,12 +10,34 @@ return new class extends Migration
     {
         Schema::create('remessas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('client_id')->constrained();
-            $table->decimal('total_creditos', 10, 2);
-            $table->enum('status', ['pendente', 'confirmado', 'cancelado'])->default('pendente');
-            $table->timestamp('data_remessa');
+
+            $table->unsignedBigInteger('user_id'); // pessoa dona da remesa
+            $table->unsignedBigInteger('user_id_solicitante_remessa')->nullable()->comment("Pessoa que solicitou a remessa"); // pessoa que solicitou a remessa
+            $table->unsignedBigInteger('user_id_executor')->nullable()->comment("Pessoa que pegou a remessa"); // pessoa que pegou remessa
+
+            $table->unsignedBigInteger('modelo_tecnico_id'); // modelo da remessa
+            $table->unsignedBigInteger('tecnologia_id'); // tecnologia da remessa
+
+            $table->integer('total_solicitacoes')->default(0);
+            $table->enum('situacao', ['pendente', 'em_producao', 'pronto para imprimir', 'concluida', 'cancelada'])->default('pendente');
+            $table->string("status")->default("pendente");
+            $table->boolean('ativo')->default(true);
+            $table->string("observacao")->nullable();
+
+            $table->timestamp('data_remessa')->nullable();
+            $table->timestamp('data_inicio_producao')->nullable();
+
+            $table->enum('posicao', ['H', 'V'])->nullable();
+
             $table->timestamps();
             $table->softDeletes();
+
+            // 🔗 Relacionamentos
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('user_id_solicitante_remessa')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('user_id_executor')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('modelo_tecnico_id')->references('id')->on('modelos_tecnicos')->onDelete('cascade');
+            $table->foreign('tecnologia_id')->references('id')->on('tecnologias')->onDelete('cascade');
         });
     }
 
@@ -23,4 +45,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('remessas');
     }
-}; 
+};

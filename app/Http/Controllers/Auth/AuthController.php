@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers\Auth;
 
+
+
 use Illuminate\Http\Request;
 use App\Services\UserService;
 use Firebase\JWT\JWT;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+
+
 use Illuminate\Support\Facades\Cache;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -33,20 +37,25 @@ class AuthController extends Controller
 
     private function identificarPerfil(array $permissions): string
     {
-        if (isset($permissions['users']) && $permissions['users'] === 'CRUD') {
-            return 'admin';
-        }
+        // if (isset($permissions['users']) && $permissions['users'] === 'CRUD') {
+        //     return 'admin';
+        // }
 
-        if (isset($permissions['clients']) && $permissions['clients'] === 'CRUD') {
-            return 'gerente';
-        }
+        // if (isset($permissions['clients']) && $permissions['clients'] === 'CRUD') {
+        //     return 'gerente';
+        // }
 
-        if (isset($permissions['clients']) && $permissions['clients'] === 'R') {
-            return 'vendedor';
-        }
+        // if (isset($permissions['clients']) && $permissions['clients'] === 'R') {
+        //     return 'vendedor';
+        // }
 
         return 'cliente'; // padrão
     }
+
+    public function roles()
+{
+    return $this->belongsToMany(Role::class);
+}
 
     /**
      * Realiza o login do usuário.
@@ -61,11 +70,12 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'senha');
+        $credentialsBody = $request->only('email', 'senha');
 
-        $user = User::where('email', $credentials['email'])->first();
 
-        if (!$user || !Hash::check($credentials['senha'], $user->senha)) {
+        $user = User::with('roles')->where('email', $credentialsBody['email'])->first();
+
+        if (!$user || !Hash::check($credentialsBody['senha'], $user->senha)) {
             return response()->json([
                 "code" => 401,
                 "status"=> "error",
@@ -74,25 +84,33 @@ class AuthController extends Controller
             ], 401);
         }
 
-        // Adicionando log para debug
-        Log::info('Usuário encontrado no login:', [
-            'cpf' => $user->cpf,
-            'email' => $user->email
-        ]);
+
 
         $token = $this->jwtService->createToken([
-            'sub' => $user->cpf,
+            'sub' => $user->id,
             'email' => $user->email
         ]);
 
-        $perfil = $this->identificarPerfil($user->permissoes);
+
+        // pegando as regras do usuário que está logando no app
+        $role = optional($user->roles->first())->makeHidden('pivot');
 
         return response()->json([
             "code" => 200,
             "message" => "Usuário logado com sucesso!",
-            "data" => $user,
+            "data" => [
+                "id" => $user->id,
+                "nome" => $user->nome,
+                "email" => $user->email,
+                "cnpj" => $user->cnpj,
+                "cpf" => $user->cpf,
+                "tipo_pessoa" => $user->tipo_pessoa,
+                "created_at" => $user->created_at,
+                "updated_at" => $user->updated_at,
+                "deleted_at" => $user->deleted_at,
+                "roles" => $role,
+            ],
             "token" => $token,
-            "role" => $perfil
         ]);
     }
 
@@ -109,7 +127,7 @@ class AuthController extends Controller
     private function gerarToken($user)
     {
         return JWT::encode([
-            'sub' => $user->CPF,
+            'sub' => $user->id,
             'email' => $user->email,
             'iat' => time(),
             'exp' => time() + 60 * 60
@@ -118,7 +136,7 @@ class AuthController extends Controller
 
     private function armazenarTokenNoCache($user, $token)
     {
-        $cacheKey = 'jwt_token_' . $user->CPF;
+        $cacheKey = 'jwt_token_' . $user->id;
         $cacheData = [
             'token' => $token,
             'email' => $user->email

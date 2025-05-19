@@ -2,43 +2,31 @@
 
 namespace Database\Seeders;
 
-use App\Models\Remessa;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 
 class RemessaSeeder extends Seeder
 {
     public function run(): void
     {
-        // Remessa confirmada para João Silva
-        Remessa::create([
-            'client_id' => 1,
-            'total_creditos' => 15.00,
-            'status' => 'confirmado',
-            'data_remessa' => now()
-        ]);
-
-        // Remessa pendente para Empresa XYZ
-        Remessa::create([
-            'client_id' => 2,
-            'total_creditos' => 450.00,
-            'status' => 'pendente',
-            'data_remessa' => now()->subDays(1)
-        ]);
-
-        // Remessa cancelada para Maria Oliveira
-        Remessa::create([
-            'client_id' => 3,
-            'total_creditos' => 25.00,
-            'status' => 'cancelado',
-            'data_remessa' => now()->subDays(2)
-        ]);
-
-        // Remessa antiga confirmada para Empresa XYZ
-        Remessa::create([
-            'client_id' => 2,
-            'total_creditos' => 225.00,
-            'status' => 'confirmado',
-            'data_remessa' => now()->subDays(5)
+        DB::table('remessas')->insert([
+            [
+                'user_id' => 2,
+                'user_id_solicitante_remessa' => 5, // ID do solicitante
+                'user_id_executor' => null,         // Pode ser null
+                'modelo_tecnico_id' => 1,
+                'tecnologia_id' => 1,
+                'total_solicitacoes' => 10,
+                'situacao' => 'pendente', // ou 'envios_dados' se já estiver padronizando
+                "status"=> "pendente",
+                "observacao"=> null,
+                'data_remessa' => Carbon::now(),
+                'data_inicio_producao' => Carbon::now(),
+                'posicao' => 'H',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
         ]);
     }
-} 
+}

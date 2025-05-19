@@ -3,68 +3,89 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // Administrador com todas as permissões
-        $admin = User::create([
-            'nome' => 'Administrador',
-            'email' => 'admin@example.com',
-            'senha' => Hash::make('admin123'),
-            'cpf' => '12345678900',
-            'permissoes' => [
-                'users' => 'CRUD',
-                'clients' => 'CRUD',
-                'products' => 'CRUD',
-                'credit_sales' => 'CRUD',
-                'remessas' => 'CRUD'
-            ]
-        ]);
+        // Lista de usuários e papéis
+        $usuarios = [
+            [
+                'nome' => 'Administrador',
+                'email' => 'admin@example.com',
+                'senha' => 'admin123',
+                'role' => 'Admin',
+                'descricao_role' => 'Responsável por gerenciar todo o sistema, incluindo usuários, permissões, configurações globais e dados operacionais. Possui acesso irrestrito a todos os recursos da plataforma.',
+                'telefone' => '31999999999',
+            ],
+            [
+                'nome' => 'WLTECH',
+                'email' => 'luansousa@gmail.com',
+                'senha' => 'cliente123',
+                'role' => 'Cliente',
+                'descricao_role' => 'Usuário externo com acesso às suas remessas e informações de produção.',
+                'telefone' => '31999999998',
+            ],
+            [
+                'nome' => 'Guilherme',
+                'email' => 'guilherme@letscom.com',
+                'senha' => 'producao123',
+                'role' => 'Producao',
+                'descricao_role' => 'Responsável por executar tarefas de produção e acompanhar remessas em andamento.',
+                'telefone' => '31999999997',
+            ],
+            [
+                'nome' => 'Alice',
+                'email' => 'alice@letscom.com',
+                'senha' => 'producao123',
+                'role' => 'Producao',
+                'descricao_role' => 'Responsável por executar tarefas de produção e acompanhar remessas em andamento.',
+                'telefone' => '31999999992',
+            ],
+            [
+                'nome' => 'Xirlene',
+                'email' => 'xirlene@example.com',
+                'senha' => 'recepcao123',
+                'role' => 'Recepcao',
+                'descricao_role' => 'Responsável por cadastrar remessas e encaminhá-las para produção.',
+                'telefone' => '31999999996',
+            ],
+            [
+                'nome' => 'Solicitante Remessa',
+                'email' => 'solicitante@example.com',
+                'senha' => 'recepcao123',
+                'role' => 'Solicitante',
+                'descricao_role' => 'Responsável por solicitar remessas.',
+                'telefone' => '31999999934',
+            ],
+        ];
 
-        // Gerente com permissões de leitura e escrita
-        User::create([
-            'nome' => 'Gerente Comercial',
-            'email' => 'gerente@example.com',
-            'senha' => Hash::make('gerente123'),
-            'cpf' => '98765432100',
-            'permissoes' => [
-                'clients' => 'CRUD',
-                'products' => 'RU',
-                'credit_sales' => 'CRUD',
-                'remessas' => 'CRUD'
-            ]
-        ]);
+        foreach ($usuarios as $dados) {
+            // Cria ou atualiza a role
+            $role = Role::firstOrCreate(
+                ['nome' => $dados['role']],
+                ['descricao' => $dados['descricao_role']]
+            );
 
-        // Operador com permissões limitadas
-        User::create([
-            'nome' => 'Operador',
-            'email' => 'operador@example.com',
-            'senha' => Hash::make('operador123'),
-            'cpf' => '45678912300',
-            'permissoes' => [
-                'clients' => 'R',
-                'products' => 'R',
-                'credit_sales' => 'CR',
-                'remessas' => 'CR'
-            ]
-        ]);
+            // Cria o usuário
+            $user = User::firstOrCreate(
+                ['email' => $dados['email']],
+                [
+                    'nome' => $dados['nome'],
+                    'senha' => Hash::make($dados['senha']),
+                    'documento' => Str::random(14),
+                    'ativo' => true,
+                    'tipo_pessoa' => 'F',
+                    'telefone' => $dados['telefone'],
+                ]
+            );
 
-        // Vendedor com permissões específicas
-        User::create([
-            'nome' => 'Vendedor',
-            'email' => 'vendedor@example.com',
-            'senha' => Hash::make('vendedor123'),
-            'cpf' => '78912345600',
-            'permissoes' => [
-                'clients' => 'CRU',
-                'products' => 'R',
-                'credit_sales' => 'CR',
-                'remessas' => 'CR'
-            ]
-        ]);
+            // Vincula o papel ao usuário
+            $user->roles()->syncWithoutDetaching([$role->id]);
+        }
     }
-} 
+}

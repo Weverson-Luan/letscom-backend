@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Services\CreditSaleService;
 use App\Models\CreditSale;
-use Illuminate\Http\Request;
 use App\Http\Requests\CreditSaleRequest;
 use Illuminate\Http\JsonResponse;
 
 /**
  * Controller para gerenciamento de Vendas de Créditos
- * 
+ *
  * @package App\Http\Controllers
  * @version 1.0.0
  */
@@ -21,7 +21,7 @@ class CreditSaleController extends Controller
 
     /**
      * Construtor do controller
-     * 
+     *
      * @param CreditSaleService $service Serviço de vendas
      */
     public function __construct(CreditSaleService $service)
@@ -31,7 +31,7 @@ class CreditSaleController extends Controller
 
     /**
      * Lista vendas com paginação
-     * 
+     *
      * @param Request $request Requisição HTTP
      * @return JsonResponse
      */
@@ -47,14 +47,14 @@ class CreditSaleController extends Controller
 
     /**
      * Cria uma nova venda
-     * 
-     * @param CreditSaleRequest $request Requisição validada
+     *
+     * @param Request $request Requisição validada
      * @return JsonResponse
      */
-    public function store(CreditSaleRequest $request): JsonResponse
+    public function store(Request $request): JsonResponse
     {
         try {
-            $sale = $this->service->create($request->validated());
+            $sale = $this->service->create($request->all());
             return response()->json($sale, 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
@@ -63,7 +63,7 @@ class CreditSaleController extends Controller
 
     /**
      * Exibe uma venda específica
-     * 
+     *
      * @param CreditSale $creditSale Venda a ser exibida
      * @return JsonResponse
      */
@@ -74,7 +74,7 @@ class CreditSaleController extends Controller
 
     /**
      * Atualiza uma venda
-     * 
+     *
      * @param CreditSaleRequest $request Requisição validada
      * @param CreditSale $creditSale Venda a ser atualizada
      * @return JsonResponse
@@ -91,7 +91,7 @@ class CreditSaleController extends Controller
 
     /**
      * Remove uma venda
-     * 
+     *
      * @param CreditSale $creditSale Venda a ser removida
      * @return JsonResponse
      */
@@ -104,4 +104,4 @@ class CreditSaleController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-} 
+}

@@ -10,7 +10,13 @@ class Product extends Model
 {
     use HasFactory, SoftDeletes;
 
+
+      // 👇 Adicione esta linha
+      protected $table = 'produtos';
+
+
     protected $fillable = [
+        'user_id',
         'nome',
         'tecnologia',
         'valor',
@@ -27,4 +33,4 @@ class Product extends Model
         'estoque_maximo' => 'integer',
         'estoque_atual' => 'integer',
     ];
-} 
+}
