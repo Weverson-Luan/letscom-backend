@@ -10,12 +10,17 @@ class CreditSale extends Model
 {
     use HasFactory, SoftDeletes;
 
+
+    protected $table = 'vendas_creditos';
+
     protected $fillable = [
-        'client_id',
+        'user_id', // <-- esse é o campo correto
         'valor',
         'quantidade_creditos',
+        'tipo_transacao',
         'status',
-        'data_venda'
+        'data_venda',
+        'observacao',
     ];
 
     protected $casts = [
@@ -28,4 +33,4 @@ class CreditSale extends Model
     {
         return $this->belongsTo(Client::class);
     }
-} 
+}

@@ -3,13 +3,14 @@
 namespace App\Services;
 
 use App\Repositories\ProductRepository;
+use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
  * Serviço para gerenciamento de Produtos
- * 
+ *
  * @package App\Services
  * @version 1.0.0
  */
@@ -20,7 +21,7 @@ class ProductService
 
     /**
      * Construtor do serviço
-     * 
+     *
      * @param ProductRepository $repository Repositório de produtos
      */
     public function __construct(ProductRepository $repository)
@@ -30,25 +31,17 @@ class ProductService
 
     /**
      * Lista produtos com paginação
-     * 
+     *
      * @param array $params Parâmetros de filtro e paginação
      * @return array
      * @throws \Exception
      */
-    public function list(array $params): array
+    public function list(array $params): LengthAwarePaginator
     {
         try {
             $products = $this->repository->paginate($params);
-            
-            return [
-                'data' => $products->items(),
-                'pagination' => [
-                    'current_page' => $products->currentPage(),
-                    'last_page' => $products->lastPage(),
-                    'per_page' => $products->perPage(),
-                    'total' => $products->total()
-                ]
-            ];
+
+            return $products;
         } catch (\Exception $e) {
             Log::error('Erro ao listar produtos: ' . $e->getMessage());
             throw $e;
@@ -57,7 +50,7 @@ class ProductService
 
     /**
      * Cria um novo produto
-     * 
+     *
      * @param array $data Dados do produto
      * @return Product
      * @throws \Exception
@@ -68,7 +61,7 @@ class ProductService
             DB::beginTransaction();
             $product = $this->repository->create($data);
             DB::commit();
-            
+
             return $product;
         } catch (\Exception $e) {
             DB::rollBack();
@@ -79,7 +72,7 @@ class ProductService
 
     /**
      * Atualiza um produto existente
-     * 
+     *
      * @param Product $product Produto a ser atualizado
      * @param array $data Novos dados
      * @return bool
@@ -91,7 +84,7 @@ class ProductService
             DB::beginTransaction();
             $success = $this->repository->update($product, $data);
             DB::commit();
-            
+
             return $success;
         } catch (\Exception $e) {
             DB::rollBack();
@@ -102,7 +95,7 @@ class ProductService
 
     /**
      * Remove um produto
-     * 
+     *
      * @param Product $product Produto a ser removido
      * @return bool
      * @throws \Exception
@@ -113,7 +106,7 @@ class ProductService
             DB::beginTransaction();
             $success = $this->repository->delete($product);
             DB::commit();
-            
+
             return $success;
         } catch (\Exception $e) {
             DB::rollBack();
@@ -121,4 +114,4 @@ class ProductService
             throw $e;
         }
     }
-} 
+}

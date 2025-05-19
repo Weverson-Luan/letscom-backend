@@ -6,92 +6,66 @@ use App\Models\ModelosTecnicosCamposVariaveis;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
- * Repositório para gerenciamento de modelo de cliente
+ * Repositório para gerenciamento de campos variáveis de modelos técnicos.
  *
  * @package App\Repositories
  * @version 1.0.0
  */
 class ModelosTecnicosCamposVariaveisRepository
 {
-    /** @var ModelosTecnicosCamposVariaveis */
-    protected $model;
+    protected ModelosTecnicosCamposVariaveis $model;
 
-    /**
-     * Construtor do repositório
-     *
-     * @param ModelosTecnicosCamposVariaveis $model Modelo de modelo tecnico
-     */
     public function __construct(ModelosTecnicosCamposVariaveis $model)
     {
         $this->model = $model;
     }
 
     /**
-     * Lista modelos com paginação e filtros
-     *
-     * @param array $params Parâmetros de filtro e paginação
-     * @return LengthAwarePaginator
+     * Lista os campos com paginação e filtros.
      */
     public function paginate(array $params): LengthAwarePaginator
     {
         $query = $this->model->query();
 
         if (!empty($params['search'])) {
-            $query->where(function($q) use ($params) {
-                $q->where('nome', 'like', "%{$params['search']}%")
-                  ->orWhere('nome_modelo', 'like', "%{$params['search']}%");
-            });
+            $query->where('nome', 'like', "%{$params['search']}%");
         }
 
         return $query->orderBy(
             $params['sort_by'] ?? 'created_at',
             $params['order'] ?? 'desc'
         )->paginate($params['per_page'] ?? 10);
-
     }
 
     /**
-     * Cria um novo modelo para cliente
-     *
-     * @param array $data Dados do modelo
-     * @return ModelosTecnicosCamposVariaveis
+     * Cria um novo campo variável.
      */
-    public function create(array $data): Product
+    public function create(array $data): ModelosTecnicosCamposVariaveis
     {
         return $this->model->create($data);
     }
 
     /**
-     * Busca um modelo pelo ID
-     *
-     * @param int $id ID do modelo para cliente
-     * @return ModelosTecnicosCamposVariaveis|null
+     * Busca um campo variável pelo ID.
      */
-    public function find($id): ?ModelosTecnicosCamposVariaveis
+    public function find(int $id): ?ModelosTecnicosCamposVariaveis
     {
         return $this->model->find($id);
     }
 
     /**
-     * Atualiza um modelo de cliente
-     *
-     * @param ModelosTecnicosCamposVariaveis $modelo Modelo a ser atualizado
-     * @param array $data Novos dados
-     * @return bool
+     * Atualiza um campo existente.
      */
-    public function update(ModeloTecnico $modelo, array $data): bool
+    public function update(ModelosTecnicosCamposVariaveis $modelo, array $data): bool
     {
         return $modelo->update($data);
     }
 
     /**
-     * Remove um produto
-     *
-     * @param ModelosTecnicosCamposVariaveis $product Modelo a ser removido
-     * @return bool
+     * Remove um campo variável.
      */
     public function delete(ModelosTecnicosCamposVariaveis $modelo): bool
     {
-        return $product->delete();
+        return $modelo->delete();
     }
 }

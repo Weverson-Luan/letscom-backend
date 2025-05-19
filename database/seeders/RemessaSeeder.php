@@ -12,19 +12,21 @@ class RemessaSeeder extends Seeder
     {
         DB::table('remessas')->insert([
             [
-                'cliente_id' => 1,
-                'user_id' => 1,
-                'modelo_tecnico_id' => 6,
+                'user_id' => 2,
+                'user_id_solicitante_remessa' => 5, // ID do solicitante
+                'user_id_executor' => null,         // Pode ser null
+                'modelo_tecnico_id' => 1,
+                'tecnologia_id' => 1,
                 'total_solicitacoes' => 10,
-                'status' => 'concluida',
+                'situacao' => 'pendente', // ou 'envios_dados' se já estiver padronizando
+                "status"=> "pendente",
+                "observacao"=> null,
                 'data_remessa' => Carbon::now(),
                 'data_inicio_producao' => Carbon::now(),
-                'tecnologia' => 'RFID',
                 'posicao' => 'H',
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ],
-
         ]);
     }
 }

@@ -3,9 +3,9 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use App\Http\Middleware\CheckPermission;
+// use App\Http\Middleware\CheckPermission;
 use App\Http\Middleware\AuthenticateWithJWT;
-use App\Http\Middleware\CheckCpfToken;
+// use App\Http\Middleware\CheckCpfToken;
 use App\Http\Middleware\RateLimitPerUser;
 use App\Http\Middleware\IcronoeventosLogger;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -21,9 +21,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'auth.jwt' => AuthenticateWithJWT::class,
-            'permission' => CheckPermission::class,
-            'check.cpf.token' => CheckCpfToken::class,
             'rate.limit.user' => RateLimitPerUser::class,
+            'role' => \App\Http\Middleware\CheckRole::class, // 👈 Adicione esta linha
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

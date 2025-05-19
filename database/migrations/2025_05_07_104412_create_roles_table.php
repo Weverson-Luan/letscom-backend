@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->json('permissoes')->nullable()->after('CPF');
+        Schema::create('roles', function (Blueprint $table) {
+            $table->id();
+            $table->string('nome')->unique(); // admin, cliente, funcionario
+            $table->string('descricao')->nullable();
+            $table->timestamps();
         });
     }
 
@@ -21,8 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('permissoes');
-        });
+        Schema::dropIfExists('roles');
     }
-}; 
+};

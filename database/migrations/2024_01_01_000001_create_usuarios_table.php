@@ -13,8 +13,11 @@ return new class extends Migration
             $table->string('nome');
             $table->string('email')->unique();
             $table->string('senha');
-            $table->string(column: 'cpf');
-            $table->rememberToken();
+            $table->string('documento')->nullable()->unique(); // cpf ou cnpj
+            $table->boolean('ativo')->default(true);
+            $table->enum('tipo_pessoa', ['F', 'J']);
+            $table->string('telefone')->unique();
+
             $table->timestamps();
             $table->softDeletes();
         });
@@ -24,4 +27,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('users');
     }
-}; 
+};

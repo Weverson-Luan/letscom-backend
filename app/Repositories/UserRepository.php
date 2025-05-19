@@ -14,10 +14,15 @@ class UserRepository
         $this->model = $model;
     }
 
+    public function paginateWithRelations(array $params)
+    {
+        return User::with(['consultor', 'produto'])->paginate($params['per_page'] ?? 15);
+    }
+
     public function paginate(array $params): LengthAwarePaginator
     {
         $query = $this->model->query();
-        
+
         if (!empty($params['search'])) {
             $query->where(function($q) use ($params) {
                 $q->where('nome', 'like', "%{$params['search']}%")
@@ -25,7 +30,7 @@ class UserRepository
                   ->orWhere('cpf', 'like', "%{$params['search']}%");
             });
         }
-        
+
         return $query->orderBy(
             $params['sort_by'] ?? 'created_at',
             $params['order'] ?? 'desc'
@@ -61,4 +66,4 @@ class UserRepository
     {
         return $this->model->where('cpf', $cpf)->first();
     }
-} 
+}

@@ -15,10 +15,10 @@ class ModelosTecnicosSeeder extends Seeder
 
         DB::table('modelos_tecnicos')->insert([
             [
-                'cliente_id' => 1,
-                'produto_id' => 1,
                 'user_id' => 1,
-                'nome_modelo' => 'Modelo RFID',
+                'produto_id' => 1,
+                "tecnologia_id"=> 1,
+                'nome_modelo' => 'Visitante',
                 'tipo_entrega' => 'Normal',
                 'posicionamento' => 'horizontal',
                 'tem_furo' => false,

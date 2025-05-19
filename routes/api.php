@@ -1,9 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\DatabaseConnectionController;
-use App\Http\Controllers\ClientController;
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CreditSaleController;
 use App\Http\Controllers\RemessaController;
@@ -12,6 +12,14 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ModeloTecnicosController;
 use App\Http\Controllers\ModelosTecnicosCamposVariaveisController;
 use App\Http\Controllers\RemessaFotoController;
+use App\Http\Controllers\RemessaPlanilhaController;
+use App\Http\Controllers\UserAtendimentoController;
+use App\Http\Controllers\EnderecoEntregaController;
+use App\Http\Controllers\TipoEntregaController;
+use App\Http\Controllers\EnderecoController;
+use App\Http\Controllers\UserClienteController;
+use App\Http\Controllers\TecnologiasController;
+use App\Http\Controllers\EntregaClienteController;
 
 /**
  * Rotas da API do Sistema de Gerenciamento de Créditos
@@ -37,19 +45,10 @@ Route::post('/login', [AuthController::class, 'login'])->middleware(RateLimitPer
  * @middleware auth.jwt
  */
 Route::middleware(['auth.jwt'])->group(function () {
-    /**
-     * Rotas de Clientes
-     * Gerenciamento completo de clientes (CRUD)
-     *
-     * @prefix clients
-     * @middleware permission
-     */
-    Route::prefix('clients')->group(function () {
-        Route::get('/', [ClientController::class, 'index'])->middleware('permission:clients,R');
-        Route::post('/', [ClientController::class, 'store'])->middleware('permission:clients,C');
-        Route::get('/{client}', [ClientController::class, 'show'])->middleware('permission:clients,R');
-        Route::put('/{client}', [ClientController::class, 'update'])->middleware('permission:clients,U');
-        Route::delete('/{client}', [ClientController::class, 'destroy'])->middleware('permission:clients,D');
+
+
+    Route::prefix('roles')->group(function () {
+        Route::get('/', [RoleController::class, 'index']);
     });
 
     /**
@@ -60,11 +59,11 @@ Route::middleware(['auth.jwt'])->group(function () {
      * @middleware permission
      */
     Route::prefix('products')->group(function () {
-        Route::get('/', [ProductController::class, 'index'])->middleware('permission:products,R');
-        Route::post('/', [ProductController::class, 'store'])->middleware('permission:products,C');
-        Route::get('/{product}', [ProductController::class, 'show'])->middleware('permission:products,R');
-        Route::put('/{product}', [ProductController::class, 'update'])->middleware('permission:products,U');
-        Route::delete('/{product}', [ProductController::class, 'destroy'])->middleware('permission:products,D');
+        Route::get('/', [ProductController::class, 'index']);
+        Route::post('/', [ProductController::class, 'store']);
+        Route::get('/{product}', [ProductController::class, 'show']);
+        Route::put('/{product}', [ProductController::class, 'update']);
+        Route::delete('/{product}', [ProductController::class, 'destroy']);
     });
 
     /**
@@ -74,13 +73,15 @@ Route::middleware(['auth.jwt'])->group(function () {
      * @prefix credit-sales
      * @middleware permission
      */
-    Route::prefix('credit-sales')->group(function () {
-        Route::get('/', [CreditSaleController::class, 'index'])->middleware('permission:credit_sales,R');
-        Route::post('/', [CreditSaleController::class, 'store'])->middleware('permission:credit_sales,C');
-        Route::get('/{creditSale}', [CreditSaleController::class, 'show'])->middleware('permission:credit_sales,R');
-        Route::put('/{creditSale}', [CreditSaleController::class, 'update'])->middleware('permission:credit_sales,U');
-        Route::delete('/{creditSale}', [CreditSaleController::class, 'destroy'])->middleware('permission:credit_sales,D');
+    Route::prefix('vendas_creditos')->group(function () {
+        Route::get('/', [CreditSaleController::class, 'index']);
+        Route::post('/', [CreditSaleController::class, 'store']);
+        Route::get('/{creditSale}', [CreditSaleController::class, 'show']);
+        Route::put('/{creditSale}', [CreditSaleController::class, 'update']);
+        Route::delete('/{creditSale}', [CreditSaleController::class, 'destroy']);
     });
+
+
 
     /**
      * Rotas de Remessas
@@ -90,32 +91,65 @@ Route::middleware(['auth.jwt'])->group(function () {
      * @middleware permission
      */
     Route::prefix('remessas')->group(function () {
-        Route::get('/', [RemessaController::class, 'index'])->middleware('permission:remessas,R');
-        Route::post('/', [RemessaController::class, 'store'])->middleware('permission:remessas,C');
-        Route::post('/{remessa}/upload-fotos', [RemessaFotoController::class, 'store']);
-        Route::get('/{remessa}', [RemessaController::class, 'show'])->middleware('permission:remessas,R');
-        Route::put('/{remessa}', [RemessaController::class, 'update'])->middleware('permission:remessas,U');
-        Route::delete('/{remessa}', [RemessaController::class, 'destroy'])->middleware('permission:remessas,D');
+            // 👤 Cliente: Cria remessa e consulta status
+        Route::get('/', [RemessaController::class, 'index'])->middleware('role:cliente,admin,producao');
+        Route::post('/', [RemessaController::class, 'store'])->middleware('role:cliente,admin');
+
+        // Usuários com acesso para produzir
+        Route::get('/tarefas-disponiveis', [RemessaController::class, 'tarefasDisponiveis'])->middleware('role:admin,producao');
+        Route::get('/minhas-tarefas', [RemessaController::class, 'minhasTarefas']);
+        Route::get('/tarefas-expedicoes', [RemessaController::class, 'tarefasEmExpedicao'])->middleware('role:admin,producao');
+        // 📷 Uploads (liberado para admin e produção se necessário)
+        Route::post('/{remessa}/upload-fotos', [RemessaFotoController::class, 'store'])->middleware('role:admin,producao');
+        Route::post('/{remessa}/upload-planilha', [RemessaPlanilhaController::class, 'store'])->middleware('role:admin,producao');
+
+
+        // 📄 Detalhes da remessa
+        Route::get('/{remessa}', [RemessaController::class, 'show'])->middleware('role:admin,cliente');
+
+        // ✏️ Atualização e exclusão (restrito a admin)
+        Route::put('/{id}', [RemessaController::class, 'update'])->middleware('role:admin,producao');
+        Route::delete('/{remessa}', [RemessaController::class, 'destroy'])->middleware('role:admin');
+
+        // // 🚦 Transições de status protegidas por role específica
+        // Route::post('/{remessa}/produzir', [RemessaStatusController::class, 'produzir'])->middleware('role:producao');
+        // Route::post('/{remessa}/expedir', [RemessaStatusController::class, 'expedir'])->middleware('role:producao');
+        // Route::post('/{remessa}/liberar', [RemessaStatusController::class, 'liberar'])->middleware('role:expedicao');
+        // Route::post('/{remessa}/finalizar', [RemessaStatusController::class, 'finalizar'])->middleware('role:recepcao');
     });
 
+
+      /**
+     * Rotas de Modelos
+     * Gerenciamento de modelos
+     *
+     * @prefix Modelos
+     * @middleware permission
+     */
     Route::prefix('modelo-tecnico')->group(function () {
         Route::get('/', [ModeloTecnicosController::class, 'index']);
-        Route::post('/', [ModeloTecnicosController::class, 'store']);
+        Route::get('/clientes/{id}', [ModeloTecnicosController::class, 'buscarPorUsuarios']);
+        Route::post('/', [ModeloTecnicosController::class, 'store'])->middleware('role:admin,cliente');
         Route::get('/{id}', [ModeloTecnicosController::class, 'show']);
-        Route::put('/{id}', [ModeloTecnicosController::class, 'update']);
-        Route::delete('/{id}', [ModeloTecnicosController::class, 'destroy']);
+        Route::put('/{id}', [ModeloTecnicosController::class, 'update'])->middleware('role:admin,cliente');
+        Route::delete('/{id}', [ModeloTecnicosController::class, 'destroy'])->middleware('role:admin,cliente');
     });
 
 
-
+    /**
+     * Rotas de Campos Variaveis para modelos
+     * Gerenciamento de campos variaveis para modelos
+     *
+     * @prefix Campos Variaveis
+     * @middleware permission
+     */
     Route::prefix('modelos-tecnicos-campos-variaveis')->group(function () {
         Route::get('/', [ModelosTecnicosCamposVariaveisController::class, 'index']);
+        Route::post('/', [ModelosTecnicosCamposVariaveisController::class, 'store'])->middleware('role:admin,cliente');
         Route::get('/{id}', [ModelosTecnicosCamposVariaveisController::class, 'show']);
+        Route::put('/{id}', [ModelosTecnicosCamposVariaveisController::class, 'update'])->middleware('role:admin,cliente');
+        Route::delete('/{id}', [ModelosTecnicosCamposVariaveisController::class, 'destroy'])->middleware('role:admin,cliente');
     });
-
-
-
-
 
 
     /**
@@ -126,13 +160,119 @@ Route::middleware(['auth.jwt'])->group(function () {
      * @middleware permission
      */
     Route::prefix('users')->group(function () {
-        Route::get('/', [UserController::class, 'index'])->middleware('permission:users,R');
-        Route::post('/', [UserController::class, 'store'])->middleware('permission:users,C');
-        Route::get('/{user}', [UserController::class, 'show'])->middleware('permission:users,R');
-        Route::put('/{user}', [UserController::class, 'update'])->middleware('permission:users,U');
-        Route::delete('/{user}', [UserController::class, 'destroy'])->middleware('permission:users,D');
+        Route::get('/', [UserController::class, 'index']);
+        Route::post('/', [UserController::class, 'store']);
+        Route::get('/{user}', [UserController::class, 'show']);
+        Route::put('/{user}', [UserController::class, 'update']);
+        Route::delete('/{user}', [UserController::class, 'destroy']);
     });
+
+    /**
+     * Rotas de Endereços de entregas
+     * Gerenciamento de endereços de entrega (CRUD)
+     *
+     * @prefix enderecos-entrega
+     * @middleware permission
+     */
+    Route::prefix('enderecos-entrega')->group(function () {
+        Route::get('/', [EnderecoEntregaController::class, 'index']);
+        Route::post('/', [EnderecoEntregaController::class, 'store']);
+        Route::get('/{id}', [EnderecoEntregaController::class, 'show']);
+        Route::put('/{id}', [EnderecoEntregaController::class, 'update']);
+        Route::delete('/{id}', [EnderecoEntregaController::class, 'destroy']);
+    });
+
+
+    /**
+     * Rotas de Usuários que fazem atendimentos dos clientes
+     * Gerenciamento de  Usuários que fazem atendimentos (CRUD)
+     *
+     * @prefix users-atendimentos
+     * @middleware permission
+     */
+    Route::prefix('users-atendimentos')->group(function () {
+        Route::get('/', [UserAtendimentoController::class, 'index']);
+        Route::post('/', [UserAtendimentoController::class, 'store']);
+        Route::get('/{id}', [UserAtendimentoController::class, 'show']);
+        Route::put('/{id}', [UserAtendimentoController::class, 'update']);
+        Route::delete('/{id}', [UserAtendimentoController::class, 'destroy']);
+    });
+
+    Route::prefix('usuarios-cliente')->group(function () {
+        Route::get('/', [UserClienteController::class, 'index']);        // Listar todos
+        Route::get('/{id}', [UserClienteController::class, 'show']);     // Detalhar um
+        Route::get('/cliente/{id}', [UserClienteController::class, 'buscarUsuariosPorCliente']);
+        Route::post('/', [UserClienteController::class, 'store']);       // Criar
+        Route::put('/{id}', [UserClienteController::class, 'update']);   // Atualizar
+        Route::delete('/{id}', [UserClienteController::class, 'destroy']); // Deletar
+    });
+
+
+     /**
+     * Rotas de tipos de entregas
+     * Gerenciamento de tipos de entregas (CRUD)
+     *
+     * @prefix tipos-entrega
+     * @middleware permission
+     */
+    Route::prefix('tipos-entrega')->group(function () {
+        Route::get('/', [TipoEntregaController::class, 'index']);
+        Route::post('/', [TipoEntregaController::class, 'store']);
+        Route::get('/{id}', [TipoEntregaController::class, 'show']);
+        Route::put('/{id}', [TipoEntregaController::class, 'update']);
+        Route::delete('/{id}', [TipoEntregaController::class, 'destroy']);
+    });
+
+     /**
+     * Rotas de Endereços
+     * Gerenciamento de endereços (CRUD)
+     *
+     * @prefix enderecos
+     * @middleware permission
+     */
+    Route::prefix('enderecos')->group(function () {
+        Route::get('/', [EnderecoController::class, 'index']);
+        Route::post('/', [EnderecoController::class, 'store']);
+        Route::get('/{id}', [EnderecoController::class, 'show']);
+        Route::put('/{id}', [EnderecoController::class, 'update']);
+        Route::delete('/{id}', [EnderecoController::class, 'destroy']);
+    });
+
+
+     /**
+     * Rotas de Endereços
+     * Gerenciamento de endereços (CRUD)
+     *
+     * @prefix enderecos
+     * @middleware permission
+     */
+    Route::prefix('tecnologias')->group(function () {
+        Route::get('/', [TecnologiasController::class, 'index']);
+        Route::post('/', [TecnologiasController::class, 'store']);
+        Route::get('/{id}', [TecnologiasController::class, 'show']);
+        Route::put('/{id}', [TecnologiasController::class, 'update']);
+        Route::delete('/{id}', [TecnologiasController::class, 'destroy']);
+    });
+
+
+         /**
+     * Rotas de entreas
+     * Gerenciamento de entregas de remessas (CRUD)
+     *
+     * @prefix enderecos
+     * @middleware permission
+     */
+    Route::prefix('entregas-cliente')->group(function () {
+        Route::get('/', [EntregaClienteController::class, 'index']);
+        Route::post('/', [EntregaClienteController::class, 'store']);
+        Route::get('/{id}', [EntregaClienteController::class, 'show']);
+        Route::put('/{id}', [EntregaClienteController::class, 'update']);
+        Route::delete('/{id}', [EntregaClienteController::class, 'destroy']);
+    });
+
 });
+
+
 
 /**
  * Rota de fallback

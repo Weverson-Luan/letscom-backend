@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('modelos_tecnicos', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('cliente_id');
-            $table->unsignedBigInteger('produto_id');
+
             $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('produto_id');
+            $table->unsignedBigInteger('tecnologia_id');
 
             $table->string('nome_modelo', 100)->nullable();
             $table->string('tipo_entrega', 100)->nullable();
@@ -30,9 +31,10 @@ return new class extends Migration
 
             $table->timestamps();
 
-            $table->foreign('cliente_id')->references('id')->on('clients')->onDelete('cascade');
-            $table->foreign('produto_id')->references('id')->on('products')->onDelete('cascade');
+            // 🔗 Relacionamentos
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('produto_id')->references('id')->on('produtos')->onDelete('cascade');
+            $table->foreign('tecnologia_id')->references('id')->on('tecnologias')->onDelete('cascade');
         });
     }
 

@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * Form Request para validação de Clientes
- * 
+ *
  * @package App\Http\Requests
  * @version 1.0.0
  */
@@ -14,7 +14,7 @@ class ClientRequest extends FormRequest
 {
     /**
      * Determina se o usuário está autorizado a fazer esta requisição
-     * 
+     *
      * @return bool
      */
     public function authorize(): bool
@@ -24,7 +24,7 @@ class ClientRequest extends FormRequest
 
     /**
      * Regras de validação
-     * 
+     *
      * @return array
      */
     public function rules(): array
@@ -48,7 +48,7 @@ class ClientRequest extends FormRequest
             $id = $this->route('client');
             $rules['email'] = "sometimes|email|unique:clients,email,{$id}";
             $rules['cpf_cnpj'] = "sometimes|string|unique:clients,cpf_cnpj,{$id}";
-            
+
             $rules = array_map(function ($rule) {
                 return str_replace('required|', '', $rule);
             }, $rules);
@@ -59,7 +59,7 @@ class ClientRequest extends FormRequest
 
     /**
      * Mensagens de erro personalizadas
-     * 
+     *
      * @return array
      */
     public function messages(): array
@@ -83,4 +83,4 @@ class ClientRequest extends FormRequest
             'numero.required' => 'O número é obrigatório'
         ];
     }
-} 
+}

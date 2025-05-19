@@ -2,118 +2,176 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\RemessaService;
-use App\Models\Remessa;
 use Illuminate\Http\Request;
-use App\Http\Requests\RemessaRequest;
 use Illuminate\Http\JsonResponse;
 
-/**
- * Controller para gerenciamento de Remessas
- *
- * @package App\Http\Controllers
- * @version 1.0.0
- */
+use Illuminate\Support\Facades\Log;
+use App\Models\Remessa;
+use App\Models\User;
+use App\Models\ModeloTecnico;
+use App\Models\UserCliente;
+use App\Services\RemessaService;
+use App\Helpers\RemessasResponseHelper;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Auth;
+
 class RemessaController extends Controller
 {
-    /** @var RemessaService */
-    protected $service;
+    protected RemessaService $service;
 
-    /**
-     * Construtor do controller
-     *
-     * @param RemessaService $service Serviço de remessas
-     */
     public function __construct(RemessaService $service)
     {
         $this->service = $service;
     }
 
-    /**
-     * Lista remessas com paginação
-     *
-     * @param Request $request Requisição HTTP
-     * @return JsonResponse
-     */
     public function index(Request $request): JsonResponse
     {
         try {
-            $result = $this->service->list($request->all());
+            $remessasPaginadas = $this->service->list($request->all());
 
-            return response()->json([
-                "code" => 200,
-                "status" => "success",
-                "message" => "Remessas carregadas com sucesso!",
-                "data" => $result['data'],
-                "pagination" => $result['pagination']
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                "code" => 500,
-                "status" => "error",
-                "message" => "Erro ao carregar remessas.",
-                "error" => $e->getMessage()
-            ], 500);
+            $data = RemessasResponseHelper::mapRemessas($remessasPaginadas->items());
+
+            return RemessasResponseHelper::jsonSuccess(
+                'Remessas carregadas com sucesso!',
+                $data,
+                [
+                    'current_page' => $remessasPaginadas->currentPage(),
+                    'last_page' => $remessasPaginadas->lastPage(),
+                    'per_page' => $remessasPaginadas->perPage(),
+                    'total' => $remessasPaginadas->total(),
+                ]
+            );
+        } catch (\Throwable $e) {
+            Log::error('Erro ao listar remessas: ' . $e->getMessage());
+            return RemessasResponseHelper::jsonError('Erro ao carregar remessas.');
         }
     }
 
-    /**
-     * Cria uma nova remessa
-     *
-     * @param RemessaRequest $request Requisição validada
-     * @return JsonResponse
-     */
-    public function store(RemessaRequest $request): JsonResponse
+    public function tarefasDisponiveis(Request $request): JsonResponse
     {
         try {
-            $remessa = $this->service->create($request->validated());
+            $remessasPaginadas = $this->service->listarDisponiveisParaProducao($request->all());
+            $data = RemessasResponseHelper::mapRemessas($remessasPaginadas->items());
+
+            return RemessasResponseHelper::jsonSuccess(
+                'Remessas disponíveis carregadas com sucesso!',
+                $data,
+                [
+                    'current_page' => $remessasPaginadas->currentPage(),
+                    'last_page' => $remessasPaginadas->lastPage(),
+                    'per_page' => $remessasPaginadas->perPage(),
+                    'total' => $remessasPaginadas->total(),
+                ]
+            );
+        } catch (\Throwable $e) {
+            Log::error('Erro ao listar remessas disponíveis: ' . $e->getMessage());
+            return RemessasResponseHelper::jsonError('Erro ao carregar remessas disponíveis.');
+        }
+    }
+
+    public function minhasTarefas(Request $request): JsonResponse
+    {
+        try {
+            $remessasPaginadas = $this->service->listarMinhasTarefas($request->all());
+
+            $data = RemessasResponseHelper::mapRemessas($remessasPaginadas->items());
+
+            return RemessasResponseHelper::jsonSuccess(
+                'Minhas remessas carregadas com sucesso!',
+                $data,
+                [
+                    'current_page' => $remessasPaginadas->currentPage(),
+                    'last_page' => $remessasPaginadas->lastPage(),
+                    'per_page' => $remessasPaginadas->perPage(),
+                    'total' => $remessasPaginadas->total(),
+                ]
+            );
+        } catch (\Throwable $e) {
+            Log::error('Erro ao listar minhas remessas: ' . $e->getMessage());
+            return RemessasResponseHelper::jsonError($e->getMessage());
+        }
+    }
+
+    public function tarefasEmExpedicao(Request $request): JsonResponse
+    {
+        try {
+            $remessasPaginadas = $this->service->listarTarefasEmExpedicao($request->all());
+
+            $data = RemessasResponseHelper::mapRemessas($remessasPaginadas->items());
+
+            return RemessasResponseHelper::jsonSuccess(
+                'Minhas em expedições carregadas com sucesso!',
+                $data,
+                [
+                    'current_page' => $remessasPaginadas->currentPage(),
+                    'last_page' => $remessasPaginadas->lastPage(),
+                    'per_page' => $remessasPaginadas->perPage(),
+                    'total' => $remessasPaginadas->total(),
+                ]
+            );
+        } catch (\Throwable $e) {
+            Log::error('Erro ao listar minhas remessas em expedições: ' . $e->getMessage());
+            return RemessasResponseHelper::jsonError("Erro ao listar minhas remessas em expedições!");
+        }
+    }
+
+    public function store(Request $request): JsonResponse
+    {
+        try {
+            $remessa = $this->service->create($request->all());
             return response()->json($remessa, 201);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
-    /**
-     * Exibe uma remessa específica
-     *
-     * @param Remessa $remessa Remessa a ser exibida
-     * @return JsonResponse
-     */
     public function show(Remessa $remessa): JsonResponse
     {
-        return response()->json($remessa->load(['client', 'items.product']));
+        return response()->json($remessa);
     }
 
-    /**
-     * Atualiza uma remessa
-     *
-     * @param RemessaRequest $request Requisição validada
-     * @param Remessa $remessa Remessa a ser atualizada
-     * @return JsonResponse
-     */
-    public function update(RemessaRequest $request, Remessa $remessa): JsonResponse
+    public function update(Request $request, $id): JsonResponse
     {
         try {
-            $success = $this->service->update($remessa, $request->validated());
-            return response()->json(['success' => $success]);
+
+            $userIdExecutouTarefa = Auth::user()->id;
+
+            $remessa = Remessa::findOrFail($id);
+
+            $data = $request->only(['situacao']);
+
+             // adiciona o user logado como executor
+            $data['user_id_executor'] = $userIdExecutouTarefa;
+
+            $success = $this->service->update($remessa, $data);
+
+            return RemessasResponseHelper::jsonSuccess(
+                'Remessa atualizada com sucesso!',
+                [
+                    'id' => $remessa->id,
+                    'situacao' => $data['situacao'] ?? $remessa->situacao
+                ]
+            );
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return RemessasResponseHelper::jsonError('Remessa não encontrada.', 422);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            if ($e->getMessage() === 'Não é possível alterar uma remessa já confirmada') {
+                return RemessasResponseHelper::jsonError($e->getMessage(), 422);
+            }
+
+            Log::error('Erro ao atualizar remessa: ' . $e->getMessage());
+            return RemessasResponseHelper::jsonError('Erro inesperado ao atualizar remessa.', 500);
         }
     }
 
-    /**
-     * Remove uma remessa
-     *
-     * @param Remessa $remessa Remessa a ser removida
-     * @return JsonResponse
-     */
     public function destroy(Remessa $remessa): JsonResponse
     {
         try {
             $success = $this->service->delete($remessa);
             return response()->json(['success' => $success]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
 }

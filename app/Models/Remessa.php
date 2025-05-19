@@ -10,25 +10,62 @@ class Remessa extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $table = 'remessas';
+
     protected $fillable = [
-        'client_id',
-        'total_creditos',
+        'user_id',
+        'user_id_executor',
+        'user_id_solicitante_remessa',
+        'modelo_tecnico_id',
+        'tecnologia_id',
+        'total_solicitacoes',
+        'situacao',
         'status',
-        'data_remessa'
+        'observacao',
+        'data_remessa',
+        'data_inicio_producao',
+        'posicao'
     ];
 
     protected $casts = [
-        'total_creditos' => 'decimal:2',
-        'data_remessa' => 'datetime'
+        'data_remessa' => 'datetime',
+        'data_inicio_producao' => 'datetime',
     ];
 
-    public function client()
+    // 🔗 Relacionamentos
+
+    public function user()
     {
-        return $this->belongsTo(Client::class);
+        //defina um relacionamento inverso de um para um ou de muitos.
+        return $this->belongsTo(User::class);
+    }
+
+    public function executor()
+    {
+        return $this->belongsTo(User::class, 'executor_user_id');
+    }
+
+    public function solicitanteRemessa()
+    {
+        return $this->belongsTo(UsersSolicitanteRemessa::class, 'solicitante_remessa_user_id');
+    }
+
+
+
+    public function modeloTecnico()
+    {
+        //defina um relacionamento inverso de um para um ou de muitos.
+        return $this->belongsTo(ModeloTecnico::class);
+    }
+
+    public function tecnologia()
+    {
+        //defina um relacionamento inverso de um para um ou de muitos.
+        return $this->belongsTo(Tecnologias::class);
     }
 
     public function items()
     {
         return $this->hasMany(RemessaItem::class);
     }
-} 
+}

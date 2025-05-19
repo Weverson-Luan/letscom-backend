@@ -4,11 +4,7 @@ namespace App\Services;
 
 use App\Models\ModelosTecnicosCamposVariaveis;
 use App\Repositories\ModelosTecnicosCamposVariaveisRepository;
-
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Hash;
 
 class ModelosTecnicosCamposVariaveisService
 {
@@ -20,49 +16,69 @@ class ModelosTecnicosCamposVariaveisService
     }
 
     /**
-     * Lista usuários com paginação
+     * Lista campos variáveis com paginação
      */
     public function list(array $params): array
     {
         try {
-            $modelosTecnicosCamposVariaveis = $this->repository->paginate($params);
+            $paginated = $this->repository->paginate($params);
+
             return [
-                'data' => $modelosTecnicosCamposVariaveis->items(),
+                'code' => 200,
+                'message' => 'Campos variáveis carregados com sucesso!',
+                'data' => $paginated->items(),
                 'pagination' => [
-                    'current_page' => $modelosTecnicosCamposVariaveis->currentPage(),
-                    'last_page' => $modelosTecnicosCamposVariaveis->lastPage(),
-                    'per_page' => $modelosTecnicosCamposVariaveis->perPage(),
-                    'total' => $modelosTecnicosCamposVariaveis->total()
-                ]
+                    'current_page' => $paginated->currentPage(),
+                    'last_page' => $paginated->lastPage(),
+                    'per_page' => $paginated->perPage(),
+                    'total' => $paginated->total(),
+                ],
             ];
         } catch (\Exception $e) {
-            Log::error('Erro ao listar campos variaveis: ' . $e->getMessage());
-            throw $e;
+            Log::error('Erro ao listar campos variáveis: ' . $e->getMessage());
+            return [
+                'code' => 500,
+                'message' => 'Erro ao carregar campos variáveis.',
+                'data' => [],
+                'pagination' => null,
+            ];
         }
     }
 
     /**
-     * Cria um novo usuário
+     * Cria um novo campo variável
      */
-    public function create(array $data): User
+    public function create(array $data): array
     {
-       return [];
+        $itensCriados = [];
+
+        $campos = $data['campos'] ?? [];
+
+        foreach ($campos as $item) {
+            $itensCriados[] = ModelosTecnicosCamposVariaveis::create([
+                'modelo_tecnico_id' => $item['modelo_tecnico_id'],
+                'nome' => $item['nome'],
+                'obrigatorio' => $item['obrigatorio'] ?? false,
+            ]);
+        }
+
+        return $itensCriados;
+    }
+    /**
+     * Atualiza um campo variável
+     */
+    public function update(int $id, array $data): bool
+    {
+        $campo = $this->repository->find($id);
+        return $campo ? $this->repository->update($campo, $data) : false;
     }
 
     /**
-     * Atualiza um usuário existente
+     * Remove um campo variável
      */
-    public function update(User $user, array $data): bool
+    public function delete(int $id): bool
     {
-        return [];
+        $campo = $this->repository->find($id);
+        return $campo ? $this->repository->delete($campo) : false;
     }
-
-    /**
-     * Remove um usuário
-     */
-    public function delete(User $user): bool
-    {
-        return [];
-    }
-
 }
