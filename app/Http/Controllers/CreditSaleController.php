@@ -7,6 +7,7 @@ use App\Services\CreditSaleService;
 use App\Models\CreditSale;
 use App\Http\Requests\CreditSaleRequest;
 use Illuminate\Http\JsonResponse;
+use App\Helpers\CreditsSalesResponseHelper;
 
 /**
  * Controller para gerenciamento de Vendas de Créditos
@@ -32,18 +33,49 @@ class CreditSaleController extends Controller
     /**
      * Lista vendas com paginação
      *
-     * @param Request $request Requisição HTTP
+     * @param Request $request Requisição HTTP buscarTransacoesPorCliente
      * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
         try {
-            $result = $this->service->list($request->all());
+
+            $response = $this->service->list($request->all());
+
+            $vendasCredito = CreditsSalesResponseHelper::mapVendasCredito($response['data']);
+
+            return CreditsSalesResponseHelper::jsonSuccess(
+                    'Histórico de transações carregadas com sucesso!',
+                    $vendasCredito,
+                    $response['pagination']
+                );
             return response()->json($result);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+    public function buscarTransacoesPorCliente(Request $request, $userId): JsonResponse
+    {
+        try {
+
+            $params = $request->all();
+            $params['user_id'] = $userId;
+
+            $transacoes = $this->service->listarTransacoes($params);
+
+            $vendasCredito = CreditsSalesResponseHelper::mapVendasCredito($transacoes->items());
+
+            return CreditsSalesResponseHelper::jsonSuccess(
+                    'Histórico de transações carregadas com sucessos!',
+                    $vendasCredito,
+                    $transacoes['pagination']
+                );
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
 
     /**
      * Cria uma nova venda

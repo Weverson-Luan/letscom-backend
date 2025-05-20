@@ -20,6 +20,7 @@ use App\Http\Controllers\EnderecoController;
 use App\Http\Controllers\UserClienteController;
 use App\Http\Controllers\TecnologiasController;
 use App\Http\Controllers\EntregaClienteController;
+use App\Http\Controllers\ProdutoUsuarioController;
 
 /**
  * Rotas da API do Sistema de Gerenciamento de Créditos
@@ -75,6 +76,7 @@ Route::middleware(['auth.jwt'])->group(function () {
      */
     Route::prefix('vendas_creditos')->group(function () {
         Route::get('/', [CreditSaleController::class, 'index']);
+        Route::get('/cliente/{id}', [CreditSaleController::class, 'buscarTransacoesPorCliente']);
         Route::post('/', [CreditSaleController::class, 'store']);
         Route::get('/{creditSale}', [CreditSaleController::class, 'show']);
         Route::put('/{creditSale}', [CreditSaleController::class, 'update']);
@@ -253,6 +255,20 @@ Route::middleware(['auth.jwt'])->group(function () {
         Route::put('/{id}', [TecnologiasController::class, 'update']);
         Route::delete('/{id}', [TecnologiasController::class, 'destroy']);
     });
+
+        /**
+     * Rotas de vincular produtos ao cliente
+     * Gerenciamento de vincular produtos ao cliente (CRUD)
+     *
+     * @prefix vincular produtos ao cliente
+     * @middleware permission
+     */
+    Route::prefix('produto-usuario')->group(function () {
+        Route::post('/vincular', [ProdutoUsuarioController::class, 'vincular']);
+        Route::post('/desvincular', [ProdutoUsuarioController::class, 'desvincular']);
+        Route::get('/{userId}/listar', [ProdutoUsuarioController::class, 'listar']);
+    });
+
 
 
          /**

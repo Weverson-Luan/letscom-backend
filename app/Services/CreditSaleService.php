@@ -6,6 +6,7 @@ use App\Repositories\CreditSaleRepository;
 use App\Models\CreditSale;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 /**
  * Serviço para gerenciamento de Vendas de Créditos
@@ -55,42 +56,48 @@ class CreditSaleService
         }
     }
 
-public function create(array $data): CreditSale
-{
-    try {
-        DB::beginTransaction();
+    public function listarTransacoes(array $params): LengthAwarePaginator
+    {
 
-        $data['status'] = 'confirmado';
-        $data['data_venda'] = now();
+        return $this->repository->buscarTransacoesPorCliente($params);
+    }
 
-        // ✅ Atualiza estoque do produto se fornecido produto_id
-        if (!empty($data['produto_id']) && isset($data['quantidade_creditos'])) {
-            $produto = \App\Models\Product::findOrFail($data['produto_id']);
+    public function create(array $data): CreditSale
+    {
+        try {
+            DB::beginTransaction();
 
-            $estoqueAtual = $produto->estoque_atual;
-            $quantidadeVendida = $data['quantidade_creditos'];
+            $data['status'] = 'confirmado';
+            $data['data_venda'] = now();
 
-            if ($quantidadeVendida > $estoqueAtual) {
-                throw new \Exception("Estoque insuficiente para o produto: {$produto->nome}");
+            // ✅ Atualiza estoque do produto se fornecido produto_id
+            if (!empty($data['produto_id']) && isset($data['quantidade_creditos'])) {
+                $produto = \App\Models\Product::findOrFail($data['produto_id']);
+
+                $estoqueAtual = $produto->estoque_atual;
+                $quantidadeVendida = $data['quantidade_creditos'];
+
+                if ($quantidadeVendida > $estoqueAtual) {
+                    throw new \Exception("Estoque insuficiente para o produto: {$produto->nome}");
+                }
+
+                $produto->update([
+                    'estoque_atual' => $estoqueAtual - $quantidadeVendida
+                ]);
             }
 
-            $produto->update([
-                'estoque_atual' => $estoqueAtual - $quantidadeVendida
-            ]);
+            // Cria a venda
+            $sale = $this->repository->create($data);
+
+            DB::commit();
+            return $sale;
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Erro ao criar venda: ' . $e->getMessage());
+            throw $e;
         }
-
-        // Cria a venda
-        $sale = $this->repository->create($data);
-
-        DB::commit();
-        return $sale;
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-        Log::error('Erro ao criar venda: ' . $e->getMessage());
-        throw $e;
     }
-}
     /**
      * Atualiza uma venda existente
      *

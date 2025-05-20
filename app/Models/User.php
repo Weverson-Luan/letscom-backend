@@ -134,15 +134,6 @@ class User extends Authenticatable
         $this->attributes['CPF'] = $value;
     }
 
-    // public function getCpfAttribute($value): ?string
-    // {
-    //     try {
-    //         return $value ? Crypt::decryptString($value) : null;
-    //     } catch (DecryptException $e) {
-    //         Log::error('Erro ao descriptografar CPF: ' . $e->getMessage());
-    //         return $value;
-    //     }
-    // }
 
     public function getAuthIdentifierName(): string
     {
@@ -160,7 +151,13 @@ class User extends Authenticatable
     }
 
     public function roles(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
-{
-    return $this->belongsToMany(Role::class, 'role_user', 'user_id', 'role_id');
-}
+    {
+        return $this->belongsToMany(Role::class, 'role_user', 'user_id', 'role_id');
+    }
+
+    public function produtosVinculados(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'produtos_vinculados_usuarios', 'user_id', 'produto_id')
+                    ->withTimestamps();
+    }
 }

@@ -27,7 +27,7 @@ class UserRepository
             $query->where(function($q) use ($params) {
                 $q->where('nome', 'like', "%{$params['search']}%")
                   ->orWhere('email', 'like', "%{$params['search']}%")
-                  ->orWhere('cpf', 'like', "%{$params['search']}%");
+                  ->orWhere('documento', 'like', "%{$params['search']}%");
             });
         }
 

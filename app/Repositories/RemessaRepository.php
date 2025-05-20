@@ -98,7 +98,7 @@ class RemessaRepository
         $query = $this->model
             ->with(['tecnologia', 'modeloTecnico', 'user'])
             ->where('situacao', 'pendente')
-            ->whereNull('user_id_executor');
+            ->whereNull('user_id_executor'); // ← garante que não foi atribuida a aoguem
 
         /**
          * QUANDO FRONT END MANDAR O CAMPO SEARCH

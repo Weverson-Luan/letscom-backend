@@ -14,8 +14,8 @@ class UserCliente extends Model
     protected $fillable = [
         'user_id',
         'email',
-        'consultor_nome',
-        'cliente_nome',
+        'nome',
+        'ativo',
     ];
 
     // Relacionamento com o usuário (opcional)

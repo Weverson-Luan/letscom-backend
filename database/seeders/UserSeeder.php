@@ -77,7 +77,7 @@ class UserSeeder extends Seeder
                 [
                     'nome' => $dados['nome'],
                     'senha' => Hash::make($dados['senha']),
-                    'documento' => Str::random(14),
+                    'documento' => str_pad(random_int(0, 99999999999999), 14, '0', STR_PAD_LEFT),
                     'ativo' => true,
                     'tipo_pessoa' => 'F',
                     'telefone' => $dados['telefone'],

@@ -138,20 +138,16 @@ class RemessaController extends Controller
 
             $remessa = Remessa::findOrFail($id);
 
-            $data = $request->only(['situacao']);
+            $data = $request->all();
 
              // adiciona o user logado como executor
             $data['user_id_executor'] = $userIdExecutouTarefa;
 
             $success = $this->service->update($remessa, $data);
 
-            return RemessasResponseHelper::jsonSuccess(
-                'Remessa atualizada com sucesso!',
-                [
-                    'id' => $remessa->id,
-                    'situacao' => $data['situacao'] ?? $remessa->situacao
-                ]
-            );
+            return RemessasResponseHelper::jsonCriacaoSuccess(
+                'Remessa atualizada com sucesso!',[$remessa]
+             );
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return RemessasResponseHelper::jsonError('Remessa não encontrada.', 422);
         } catch (\Exception $e) {

@@ -67,9 +67,6 @@ class RemessaService
 
             DB::beginTransaction();
 
-            if (isset($data['situacao']) && $data['situacao'] === 'confirmado') {
-                // lógica adicional se necessário
-            }
 
             $success = $this->repository->update($remessa, $data);
 
