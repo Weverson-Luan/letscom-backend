@@ -17,7 +17,8 @@ class UsersResponseHelper
         $entradas = $creditSales->where('tipo_transacao', 'entrada')->sum('quantidade_creditos');
         $saidas = $creditSales->where('tipo_transacao', 'saida')->sum('quantidade_creditos');
 
-        $user['consultor'] = \App\Models\UserCliente::where('user_id', $user['id'])->first();
+        $user['consultor'] = \App\Models\UserAtendimento::where('user_id', $user['id'])->first();
+        $user["contato"] = \App\Models\UserCliente::where('user_id', $user['id'])->first();
         $user['designer'] = isset($user['user_id_executor'])
             ? \App\Models\User::find($user['user_id_executor'])
             : null;
@@ -30,9 +31,6 @@ class UsersResponseHelper
             'entradas' => $entradas,
             'saidas' => $saidas,
         ];
-
-
-
 
         return $user;
     }, $users);

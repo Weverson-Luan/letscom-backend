@@ -15,6 +15,7 @@ class UserCliente extends Model
         'user_id',
         'email',
         'nome',
+        'documento',
         'ativo',
     ];
 

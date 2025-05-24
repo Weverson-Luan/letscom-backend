@@ -15,7 +15,7 @@ class UserSolicitanteRemessa extends Model
         'remessa_id',
         'user_id',
         'nome',
-        'cpf',
+        'documento',
         'telefone',
     ];
 

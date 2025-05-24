@@ -12,19 +12,22 @@ class UsuarioClienteSeeder extends Seeder
     {
         UserCliente::create([
             'user_id' => 2,
-            'email' => 'tiago2025@gmail.com',
-            'nome' => 'Tiago Gurgel',
+            'nome' => 'Marlon da Silva',
+            'email' => 'marlon.atendimento@example.com',
+            "documento"=> "148766598634",
             'ativo' => true,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);
 
-        // UsuarioCliente::create([
-        //     'user_id' => 1,
-        //     'cliente_nome' => 'Leandro Sousa',
-        //     'consultor_nome' => 'Consultor 2',
-        //     'created_at' => Carbon::now(),
-        //     'updated_at' => Carbon::now(),
-        // ]);
+        UserCliente::create([
+            'user_id' => 1,
+            'nome' => 'Maria Souza',
+            'email' => 'maria.atendimento@example.com',
+            'documento' => '12097387489',
+            'ativo' => true,
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
     }
 }

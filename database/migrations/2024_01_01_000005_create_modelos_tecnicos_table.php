@@ -24,6 +24,8 @@ return new class extends Migration
             $table->boolean('tem_furo')->default(false);
             $table->boolean('tem_carga_foto')->default(false);
             $table->boolean('tem_dados_variaveis')->default(false);
+            $table->boolean('ativo')->default(true);
+            $table->enum('tipo_furo', ['ovoide', 'redondo'])->nullable();
             $table->string('campo_chave', 50)->nullable();
             $table->string('foto_frente_path', 255)->nullable();
             $table->string('foto_verso_path', 255)->nullable();

@@ -13,6 +13,7 @@ class ModeloTecnico extends Model
         'tecnologia_id',
         'nome_modelo',
         'tipo_entrega',
+        "tipo_furo",
         'posicionamento',
         'tem_furo',
         'tem_carga_foto',

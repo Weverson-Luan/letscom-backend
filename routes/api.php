@@ -129,12 +129,12 @@ Route::middleware(['auth.jwt'])->group(function () {
      * @middleware permission
      */
     Route::prefix('modelo-tecnico')->group(function () {
-        Route::get('/', [ModeloTecnicosController::class, 'index']);
-        Route::get('/clientes/{id}', [ModeloTecnicosController::class, 'buscarPorUsuarios']);
-        Route::post('/', [ModeloTecnicosController::class, 'store'])->middleware('role:admin,cliente');
+        Route::get('/', [ModeloTecnicosController::class, 'index'])->middleware('role:admin,cliente,producao');
+        Route::get('/clientes/{id}', [ModeloTecnicosController::class, 'buscarPorUsuarios'])->middleware('role:admin,cliente,producao');
+        Route::post('/', [ModeloTecnicosController::class, 'store'])->middleware('role:admin,cliente,producao');
         Route::get('/{id}', [ModeloTecnicosController::class, 'show']);
-        Route::put('/{id}', [ModeloTecnicosController::class, 'update'])->middleware('role:admin,cliente');
-        Route::delete('/{id}', [ModeloTecnicosController::class, 'destroy'])->middleware('role:admin,cliente');
+        Route::put('/{id}', [ModeloTecnicosController::class, 'update'])->middleware('role:admin,cliente,producao');
+        Route::delete('/{id}', [ModeloTecnicosController::class, 'destroy'])->middleware('role:admin,cliente,producao');
     });
 
 

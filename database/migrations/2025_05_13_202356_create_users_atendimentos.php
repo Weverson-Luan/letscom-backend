@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('nome')->nullable(); // nome do atendente
             $table->string('email')->unique(); // e-mail do atendente
             $table->string("telefone");
+            $table->string('documento')->nullable()->unique(); // cpf ou cnpj
             $table->boolean('ativo')->default(true);
 
             $table->timestamps();

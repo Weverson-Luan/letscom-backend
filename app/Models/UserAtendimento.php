@@ -15,6 +15,7 @@ class UserAtendimento extends Model
         'user_id',
         'nome',
         'email',
+        'documento',
         'telefone',
     ];
 

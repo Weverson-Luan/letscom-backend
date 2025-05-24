@@ -42,7 +42,7 @@ class UserRepository
         return $this->model->create($data);
     }
 
-    public function update(User $user, array $data): bool
+    public function update(User $user, array $data)
     {
         return $user->update($data);
     }

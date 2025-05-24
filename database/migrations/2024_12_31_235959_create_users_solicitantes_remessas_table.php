@@ -19,7 +19,7 @@ return new class extends Migration
 
 
             $table->string('nome');
-            $table->string('cpf', 14); // formato 000.000.000-00 ou apenas números
+            $table->string('documento'); // formato 000.000.000-00 ou apenas números
             $table->string('telefone', 20); // com DDD
 
 

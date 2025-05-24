@@ -24,6 +24,8 @@ class DatabaseSeeder extends Seeder
             UsuarioClienteSeeder::class, // Usuário do cliente (vedendor da letscom)
             RemessaSeeder::class,     // Remessas
             RemessaItemSeeder::class,  // Itens das remessas
+            UserSolicitanteRemessaSeeder::class, // usuários que pode solicitar remessas
+            UsersAtendimentosSeeder::class, // usuário que vão atender o cliente
             CreditSaleSeeder::class,  // Vendas de créditos
         ]);
     }

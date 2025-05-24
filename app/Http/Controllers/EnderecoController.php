@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Services\EnderecoService;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use App\Helpers\EnderecoResponseHelper;
 
 class EnderecoController extends Controller
 {
@@ -14,9 +16,22 @@ class EnderecoController extends Controller
         $this->service = $service;
     }
 
-    public function index()
+    public function index(Request $request):JsonResponse
     {
-        return response()->json($this->service->getAll());
+
+    $enderecos = $this->service->getAll($request->all());
+
+
+    return EnderecoResponseHelper::jsonSuccess(
+    'Lista paginada de endereços',
+    EnderecoResponseHelper::mapEnderecos($enderecos['data']),
+    [
+        'current_page' => $enderecos['pagination']['current_page'],
+        'last_page' => $enderecos['pagination']['last_page'],
+        'per_page' => $enderecos['pagination']['per_page'],
+        'total' => $enderecos['pagination']['total'],
+    ]
+    );
     }
 
     public function store(Request $request)

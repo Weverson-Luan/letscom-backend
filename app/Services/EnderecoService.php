@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Repositories\EnderecoRepository;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class EnderecoService
 {
@@ -13,9 +14,21 @@ class EnderecoService
         $this->repository = $repository;
     }
 
-    public function getAll()
+    public function getAll(array $params): array
+
     {
-        return $this->repository->all();
+          $users = $this->repository->buscarTodosEnderecos($params);
+            return [
+                'data' => $users->items(),
+                'pagination' => [
+                    'current_page' => $users->currentPage(),
+                    'last_page' => $users->lastPage(),
+                    'per_page' => $users->perPage(),
+                    'total' => $users->total()
+                ]
+            ];
+
+
     }
 
     public function getById($id)

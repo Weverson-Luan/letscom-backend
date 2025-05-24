@@ -16,7 +16,9 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('email')->unique();
             $table->string('nome')->nullable();
+            $table->string('documento')->nullable()->unique(); // cpf ou cnpj
             $table->boolean('ativo')->default(true);
+
             $table->timestamps();
 
             // 🔗 Relacionamentos
