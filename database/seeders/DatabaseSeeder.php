@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,  // Usuários (para autenticação)
             EnderecoSeeder::class, // Criar endereços para usuários
             TiposEntregaSeeder::class, // Criar endereços para usuários
+            TipoEntregaUserSeeder::class, // Criar relacionamento tipo de entrega + usuário
             ProductSeeder::class,     // Produtos (necessário para remessas)
             TecnologiasSeeder::class, // Tecnologias [Mirafe, RFID]
             ModelosTecnicosSeeder::class, // Modelo do cliente (crachás)

@@ -8,7 +8,7 @@ class ModeloTecnico extends Model
     protected $table = 'modelos_tecnicos';
 
     protected $fillable = [
-        'user_id',
+        'cliente_id',
         'produto_id',
         'tecnologia_id',
         'nome_modelo',

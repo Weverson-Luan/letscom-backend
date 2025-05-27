@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
 
             $table->unsignedBigInteger('remessa_id');
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('cliente_id'); // qual cliente os usuários solicitantes pertece
 
 
             $table->string('nome');
@@ -27,7 +27,7 @@ return new class extends Migration
 
              // 🔗 Relacionamentos
              $table->foreign('remessa_id')->references('id')->on('remessas')->onDelete('cascade');
-             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+             $table->foreign('cliente_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

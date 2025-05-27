@@ -11,7 +11,6 @@ class ProductSeeder extends Seeder
     {
         // Produto básico com estoque médio
         Product::create([
-            'user_id' => 1,
             'nome' => 'Cartão PVC',
             'tecnologia' => 'RFID',
             'valor' => 15.00,
@@ -23,7 +22,6 @@ class ProductSeeder extends Seeder
 
         // Produto premium com estoque baixo
         Product::create([
-            'user_id' => 1,
             'nome' => 'Cartão Fosco',
             'tecnologia' => 'NFC',
             'valor' => 25.00,
@@ -35,7 +33,6 @@ class ProductSeeder extends Seeder
 
         // Produto empresarial com estoque alto
         Product::create([
-            'user_id' => 1,
             'nome' => 'Cartão PVC adesivado',
             'tecnologia' => 'RFID/NFC',
             'valor' => 45.00,
@@ -47,7 +44,6 @@ class ProductSeeder extends Seeder
 
         // Produto econômico com estoque crítico
         Product::create([
-            'user_id' => 1,
             'nome' => 'Tarja RFID 125KHz',
             'tecnologia' => 'RFID',
             'valor' => 10.00,
@@ -59,7 +55,6 @@ class ProductSeeder extends Seeder
 
           // Produto econômico com estoque crítico
         Product::create([
-            'user_id' => 1,
             'nome' => 'Chip MIFARE',
             'tecnologia' => 'Mifare 13,56kHz',
             'valor' => 10.00,

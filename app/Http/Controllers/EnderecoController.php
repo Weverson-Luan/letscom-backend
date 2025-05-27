@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Helpers\EnderecoResponseHelper;
 
+
 class EnderecoController extends Controller
 {
     protected $service;
@@ -57,7 +58,13 @@ class EnderecoController extends Controller
 
     public function show($id)
     {
-        return response()->json($this->service->getById($id));
+
+        $endereco = $this->service->getById($id);
+
+        return EnderecoResponseHelper::jsonSingleEndereco(
+            'Endereço carregado com sucesso!',
+            $endereco ?? [],
+        );
     }
 
     public function update(Request $request, $id)

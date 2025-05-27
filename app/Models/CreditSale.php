@@ -14,7 +14,7 @@ class CreditSale extends Model
     protected $table = 'vendas_creditos';
 
     protected $fillable = [
-        'user_id', // <-- esse é o campo correto
+        'cliente_id', // <-- esse é o campo correto
         'user_id_executor',
         'produto_id',
         'valor',

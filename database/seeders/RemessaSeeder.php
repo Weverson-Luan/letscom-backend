@@ -12,7 +12,7 @@ class RemessaSeeder extends Seeder
     {
         DB::table('remessas')->insert([
             [
-                'user_id' => 2,
+                'cliente_id' => 2, // cliente que solicitou remessa
                 'user_id_solicitante_remessa' => 5, // ID do solicitante
                 'user_id_executor' => null,         // Pode ser null
                 'modelo_tecnico_id' => 1,
@@ -28,7 +28,7 @@ class RemessaSeeder extends Seeder
                 'updated_at' => Carbon::now(),
             ],
              [
-                'user_id' => 2,
+                'cliente_id' => 2, // cliente que solicitou remessa
                 'user_id_solicitante_remessa' => 5, // ID do solicitante
                 'user_id_executor' => null,         // Pode ser null
                 'modelo_tecnico_id' => 1,

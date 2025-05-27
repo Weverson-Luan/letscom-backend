@@ -19,7 +19,7 @@ class UserController extends Controller
         $this->service = $service;
     }
 
-    public function index(Request $request): JsonResponse
+    public function buscarClientes(Request $request): JsonResponse
     {
         try {
             $result = $this->service->list($request->all());
@@ -88,13 +88,19 @@ class UserController extends Controller
         }
     }
 
-    public function show(User $user): JsonResponse
+    public function buscarPorUmUsuario($id): JsonResponse
     {
         try {
-            return response()->json($user);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
+
+            $user = $this->service->buscarUsuarioComTipoEntrega($id);
+
+            return UsersResponseHelper::jsonSingleUser(
+                    'Usuários encontrado com sucesso!',
+                    $user ?? [],
+            );
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        return UsersResponseHelper::jsonErrorNotFoud('Usuário não encontrado.', 404);
+    }
     }
 
     public function update(Request $request, $id): JsonResponse

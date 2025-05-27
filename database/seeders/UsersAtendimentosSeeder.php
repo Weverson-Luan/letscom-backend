@@ -15,7 +15,7 @@ class UsersAtendimentosSeeder extends Seeder
     {
         DB::table('users_atendimentos')->insert([
             [
-                'user_id' => 1, // Altere conforme o ID do cliente existente
+                'cliente_id' => 1, // Altere conforme o ID do cliente existente
                 'nome' => 'Guilherme',
                 'email' => 'guilherme@letscom.com',
                 'telefone' => '31999990000',
@@ -25,7 +25,7 @@ class UsersAtendimentosSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'user_id' => 2,
+                'cliente_id' => 2,
                 'nome' => 'Alice',
                 'email' => 'alice@letscom.com',
                 'documento' => '98765432100',

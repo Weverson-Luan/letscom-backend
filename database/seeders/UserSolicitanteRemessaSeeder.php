@@ -13,7 +13,7 @@ class UserSolicitanteRemessaSeeder extends Seeder
     {
         UserSolicitanteRemessa::create([
             'remessa_id' => 1,
-            'user_id' => 1,
+            'cliente_id' => 1, // qual cliente pertece
             'nome' => 'Fulano de Tal',
             'documento' => '36589526520',
             'telefone' => '31982132413',

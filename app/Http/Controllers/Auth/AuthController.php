@@ -10,7 +10,7 @@ use Firebase\JWT\JWT;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
-
+use App\Models\UserCliente;
 
 use Illuminate\Support\Facades\Cache;
 use App\Http\Controllers\Controller;
@@ -68,31 +68,19 @@ class AuthController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException Se as credenciais fornecidas não passarem na validação.
      */
-    public function login(Request $request)
-    {
-        $credentialsBody = $request->only('email', 'senha');
+public function login(Request $request)
+{
+    $credentialsBody = $request->only('email', 'senha');
 
+    // TENTATIVA 1: login como User (empresa/admin)
+    $user = User::with('roles')->where('email', $credentialsBody['email'])->first();
 
-        $user = User::with('roles')->where('email', $credentialsBody['email'])->first();
-
-        if (!$user || !Hash::check($credentialsBody['senha'], $user->senha)) {
-            return response()->json([
-                "code" => 401,
-                "status"=> "error",
-                'error' => 'Usuário ou senha inválidos. Verifique suas credenciais e tente novamente!',
-
-            ], 401);
-        }
-
-
-
+    if ($user && Hash::check($credentialsBody['senha'], $user->senha)) {
         $token = $this->jwtService->createToken([
             'sub' => $user->id,
-            'email' => $user->email
+            'email' => $user->email,
         ]);
 
-
-        // pegando as regras do usuário que está logando no app
         $role = optional($user->roles->first())->makeHidden('pivot');
 
         return response()->json([
@@ -100,19 +88,56 @@ class AuthController extends Controller
             "message" => "Usuário logado com sucesso!",
             "data" => [
                 "id" => $user->id,
+                "tipo_login" => "user",
                 "nome" => $user->nome,
                 "email" => $user->email,
-                "cnpj" => $user->cnpj,
-                "cpf" => $user->cpf,
+                "cpf" => $user->cpf ?? null,
+                "cnpj" => $user->cnpj ?? null,
                 "tipo_pessoa" => $user->tipo_pessoa,
-                "created_at" => $user->created_at,
-                "updated_at" => $user->updated_at,
-                "deleted_at" => $user->deleted_at,
                 "roles" => $role,
             ],
             "token" => $token,
         ]);
     }
+
+    // TENTATIVA 2: login como UserCliente (representante)
+    $clienteUser = UserCliente::where('email', $credentialsBody['email'])->first();
+
+    if ($clienteUser && Hash::check($credentialsBody['senha'], $clienteUser->senha)) {
+        $token = $this->jwtService->createToken([
+            'sub' => $clienteUser->id,
+            'email' => $clienteUser->email,
+            'cliente_id' => $clienteUser->cliente_id,
+        ]);
+
+        return response()->json([
+            "code" => 200,
+            "message" => "Usuário cliente logado com sucesso!",
+            "data" => [
+                "id" => $clienteUser->id,
+                "tipo_login" => "cliente_usuario",
+                "nome" => $clienteUser->nome,
+                "email" => $clienteUser->email,
+                "cliente_id" => $clienteUser->cliente_id,
+                "roles" => [
+                    "id" => 100,
+                    "nome" => "Subordinado",
+                    "descricao" => "Usuário vinculado a uma empresa cliente, com acesso limitado para realizar ações em nome da organização. Pode visualizar e solicitar remessas, consultar entregas, e interagir com funcionalidades autorizadas pela empresa principal."
+
+                ]
+            ],
+            "token" => $token,
+        ]);
+    }
+
+    // Nenhum dos dois logins funcionou
+    return response()->json([
+        "code" => 401,
+        "status"=> "error",
+        'error' => 'Usuário ou senha inválidos. Verifique suas credenciais e tente novamente!',
+    ], 401);
+}
+
 
     private function verificarSenha($senhaFornecida, $senhaArmazenada)
     {
@@ -137,12 +162,17 @@ class AuthController extends Controller
     private function armazenarTokenNoCache($user, $token)
     {
         $cacheKey = 'jwt_token_' . $user->id;
+
+        // Remove token anterior, se existir
+        Cache::forget($cacheKey);
+
         $cacheData = [
             'token' => $token,
             'email' => $user->email
         ];
 
-        if (!Cache::put($cacheKey, $cacheData, now()->addMinutes(30))) {
+        // Armazena indefinidamente
+        if (!Cache::forever($cacheKey, $cacheData)) {
             throw new \Exception('Falha ao armazenar token no cache');
         }
     }

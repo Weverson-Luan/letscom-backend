@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('remessas', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('user_id'); // pessoa dona da remesa
+            $table->unsignedBigInteger('cliente_id'); // pessoa dona da remesa
             $table->unsignedBigInteger('user_id_solicitante_remessa')->nullable()->comment("Pessoa que solicitou a remessa"); // pessoa que solicitou a remessa
             $table->unsignedBigInteger('user_id_executor')->nullable()->comment("Pessoa que pegou a remessa"); // pessoa que pegou remessa
 
@@ -33,7 +33,7 @@ return new class extends Migration
             $table->softDeletes();
 
             // 🔗 Relacionamentos
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');// qual cliente pertece essa remessa
+            $table->foreign('cliente_id')->references('id')->on('users')->onDelete('cascade');// qual cliente pertece essa remessa
             $table->foreign('user_id_solicitante_remessa')->references('id')->on('users')->onDelete('cascade'); // quem que solicitou a remessa dentro do sistema
             $table->foreign('user_id_executor')->references('id')->on('users')->onDelete('cascade'); // reponsável por pegar a remessa para produzir
             $table->foreign('modelo_tecnico_id')->references('id')->on('modelos_tecnicos')->onDelete('cascade'); // modelo que o deve ser feito o crachá

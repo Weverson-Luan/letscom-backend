@@ -64,9 +64,11 @@ class ModeloTecnicosRepository
         return $this->model->find($id);
     }
 
-    public function update(ModeloTecnico $modelo, array $data): bool
+    public function update($id, array $data)
     {
-        return $modelo->update($data);
+       $modelo = $this->find(2);
+       $modelo->update($data);
+        return $modelo;
     }
 
     public function delete(ModeloTecnico $modelo): bool

@@ -13,7 +13,7 @@ class RemessaPlanilha extends Model
 
     protected $fillable = [
         'remessa_id',
-        'user_id',
+        'cliente_id',
         'file_path',
         'tipo',
     ];

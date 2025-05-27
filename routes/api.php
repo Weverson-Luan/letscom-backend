@@ -21,7 +21,7 @@ use App\Http\Controllers\UserClienteController;
 use App\Http\Controllers\TecnologiasController;
 use App\Http\Controllers\EntregaClienteController;
 use App\Http\Controllers\ProdutoUsuarioController;
-
+use App\Http\Controllers\TipoEntregaUserController;
 /**
  * Rotas da API do Sistema de Gerenciamento de Créditos
  *
@@ -50,6 +50,7 @@ Route::middleware(['auth.jwt'])->group(function () {
 
     Route::prefix('roles')->group(function () {
         Route::get('/', [RoleController::class, 'index']);
+        Route::post('/', [RoleController::class, 'store']);
     });
 
     /**
@@ -133,7 +134,7 @@ Route::middleware(['auth.jwt'])->group(function () {
         Route::get('/clientes/{id}', [ModeloTecnicosController::class, 'buscarPorUsuarios'])->middleware('role:admin,cliente,producao');
         Route::post('/', [ModeloTecnicosController::class, 'store'])->middleware('role:admin,cliente,producao');
         Route::get('/{id}', [ModeloTecnicosController::class, 'show']);
-        Route::put('/{id}', [ModeloTecnicosController::class, 'update'])->middleware('role:admin,cliente,producao');
+        Route::post('/{id}', [ModeloTecnicosController::class, 'atualizarModelo'])->middleware('role:admin,cliente,producao');
         Route::delete('/{id}', [ModeloTecnicosController::class, 'destroy'])->middleware('role:admin,cliente,producao');
     });
 
@@ -162,9 +163,9 @@ Route::middleware(['auth.jwt'])->group(function () {
      * @middleware permission
      */
     Route::prefix('users')->group(function () {
-        Route::get('/', [UserController::class, 'index']);
+        Route::get('/', [UserController::class, 'buscarClientes']);
         Route::post('/', [UserController::class, 'store']);
-        Route::get('/{user}', [UserController::class, 'show']);
+        Route::get('/{user}', [UserController::class, 'buscarPorUmUsuario']);
         Route::put('/{user}', [UserController::class, 'update']);
         Route::delete('/{user}', [UserController::class, 'destroy']);
     });
@@ -219,6 +220,8 @@ Route::middleware(['auth.jwt'])->group(function () {
      */
     Route::prefix('tipos-entrega')->group(function () {
         Route::get('/', [TipoEntregaController::class, 'index']);
+        Route::get('/usuarios/{id}', [TipoEntregaUserController::class, 'listar']);
+        Route::post('/vincular-tipos-entrega/users', [TipoEntregaUserController::class, 'vincular']);
         Route::post('/', [TipoEntregaController::class, 'store']);
         Route::get('/{id}', [TipoEntregaController::class, 'show']);
         Route::put('/{id}', [TipoEntregaController::class, 'update']);

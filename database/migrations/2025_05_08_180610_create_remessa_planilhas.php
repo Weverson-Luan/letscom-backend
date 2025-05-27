@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
 
             $table->unsignedBigInteger('remessa_id');
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('cliente_id');
 
             $table->string('file_path'); // Ex: remessas/planilhas/9/exportacao_abril.xlsx
             $table->string('tipo')->nullable(); // Ex: 'exportacao', 'relatorio', 'resumo' (opcional)
@@ -24,7 +24,7 @@ return new class extends Migration
 
             // 🔗 Relacionamentos
             $table->foreign('remessa_id')->references('id')->on('remessas')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('cliente_id')->references('id')->on('users')->onDelete('cascade');
 
         });
     }

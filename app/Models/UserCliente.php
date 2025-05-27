@@ -2,26 +2,41 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
-class UserCliente extends Model
+class UserCliente extends Authenticatable
 {
-    use HasFactory;
+    use HasApiTokens, Notifiable;
 
     protected $table = 'users_cliente';
 
     protected $fillable = [
-        'user_id',
+        'cliente_id',
         'email',
         'nome',
+        'senha',
         'documento',
         'ativo',
     ];
 
-    // Relacionamento com o usuário (opcional)
-    public function user()
+    protected $hidden = ['senha'];
+
+    /**
+     * Retorna a senha para autenticação.
+     * Laravel espera por padrão o campo "password", então sobrescrevemos.
+     */
+    public function getAuthPassword()
     {
-        return $this->belongsTo(User::class);
+        return $this->senha;
+    }
+
+    /**
+     * Relacionamento com a empresa (cliente principal)
+     */
+    public function cliente()
+    {
+        return $this->belongsTo(User::class, 'cliente_id');
     }
 }

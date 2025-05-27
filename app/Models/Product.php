@@ -16,7 +16,6 @@ class Product extends Model
 
 
     protected $fillable = [
-        'user_id',
         'nome',
         'tecnologia',
         'valor',

@@ -11,7 +11,7 @@ class CreditSaleSeeder extends Seeder
     {
         // Venda confirmada para João Silva
         CreditSale::create([
-            'user_id' => 1,
+            'cliente_id' => 1,
             'produto_id' => 1,
             'user_id_executor' => 2,
             'valor' => 1000.00,
@@ -24,7 +24,7 @@ class CreditSaleSeeder extends Seeder
 
         // Venda pendente para Empresa XYZ
         CreditSale::create([
-            'user_id' => 2,
+            'cliente_id' => 2,
             'produto_id' => 1,
             'user_id_executor' => 2,
             'valor' => 5000.00,

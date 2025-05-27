@@ -1,14 +1,14 @@
 # 🧾Etapas do processo de remessa:
 
-envios_dados -> Cliente solicitou
+solicitado -> Cliente solicitou
 
-em_producao -> Produção iniciou
+em_producao -> Produção iniciou a remessa
 
-expedicao -> Produção finalizou
+expedicao -> Produção finalizou a remessa
 
-pedido_liberado -> Expedição liberou
+pedido_liberado -> Expedição liberou a remessa
 
-finalizado -> Recepção deu baixa
+entregue -> Recepção deu baixa
 
 # ✅Ordem recomendada para organização:
 

@@ -69,7 +69,7 @@ class RemessasResponseHelper
                 'prazo' => (int) $dataRemessa->diffInDays(Carbon::now()), // dias corridos aprtir da data criacao
                 'cliente' => \App\Models\User::find($remessa->user_id),
                 'solicitante' => \App\Models\User::find($remessa->user_id_solicitante_remessa),
-                'consultor' => \App\Models\UserCliente::where("user_id", $remessa->user_id)->first(),
+                'consultor' => \App\Models\UserCliente::where("cliente_id", $remessa->user_id)->first(),
                 'designer' => \App\Models\User::find($remessa->user_id_executor),
                 'modelo_tecnico' => \App\Models\ModeloTecnico::find($remessa->modelo_tecnico_id),
                 'created_at' => $remessa->created_at,

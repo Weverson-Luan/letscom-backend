@@ -133,17 +133,9 @@ class ModeloTecnicosService
         return $this->repository->find($id) ?? throw new \Exception('Modelo técnico não encontrado');
     }
 
-    public function update(int $id, array $data): ModeloTecnico
+    public function atualizarModelo(int $id, array $data): ModeloTecnico
     {
-        $modelo = $this->repository->find($id);
-
-        if (!$modelo) {
-            throw new \Exception('Modelo técnico não encontrado');
-        }
-
-        $this->repository->update($modelo, $data);
-
-        return $modelo;
+      return $this->repository->update($id, $data);
     }
 
     public function delete(int $id): bool

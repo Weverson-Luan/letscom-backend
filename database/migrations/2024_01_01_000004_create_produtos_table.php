@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('produtos', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
 
             $table->string('nome');
             $table->string('tecnologia');
@@ -23,10 +22,6 @@ return new class extends Migration
 
             $table->timestamps();
             $table->softDeletes();
-
-
-            // 🔗 Relacionamentos
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

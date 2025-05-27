@@ -22,6 +22,16 @@ class EnderecoResponseHelper
         ], $code);
     }
 
+    public static function jsonSingleEndereco($message, $user, $code = 200): JsonResponse
+    {
+        return response()->json([
+            'code' => $code,
+            'status' => 'success',
+            'message' => $message,
+            'data' => $user,
+        ], $code);
+    }
+
     public static function jsonError($message, $code = 500): JsonResponse
     {
         return response()->json([

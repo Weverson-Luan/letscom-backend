@@ -6,6 +6,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Services\ModeloTecnicosService;
+use App\Models\ModeloTecnico;
 use App\Helpers\ModeloTecnicosResponseHelper;
 
 class ModeloTecnicosController extends Controller
@@ -99,20 +100,35 @@ class ModeloTecnicosController extends Controller
         }
     }
 
-    public function update(Request $request, int $id): JsonResponse
-    {
-        try {
-            $modelo = $this->service->update($id, $request->all());
 
-            return ModeloTecnicosResponseHelper::jsonSuccess(
-                'Modelo atualizado com sucesso.',
-                $modelo
-            );
-        } catch (\Throwable $e) {
-            Log::error('Erro ao atualizar modelo técnico: ' . $e->getMessage());
-            return ModeloTecnicosResponseHelper::jsonError('Erro ao atualizar modelo técnico.');
+public function atualizarModelo(Request $request, int $id): JsonResponse
+{
+    try {
+
+
+        $data = $request->all();
+
+        // Salva imagens se forem enviadas
+        if ($request->hasFile('foto_frente')) {
+            $data['foto_frente_path'] = $request->file('foto_frente')->store('modelos/frente', 'public');
         }
+
+        if ($request->hasFile('foto_verso')) {
+            $data['foto_verso_path'] = $request->file('foto_verso')->store('modelos/verso', 'public');
+        }
+
+        $modelo = $this->service->atualizarModelo($id, $data);
+
+        return ModeloTecnicosResponseHelper::jsonSuccess(
+            'Modelo atualizado com sucesso.',
+            $modelo
+        );
+    } catch (\Throwable $e) {
+        Log::error('Erro ao atualizar modelo técnico: ' . $e->getMessage());
+        return ModeloTecnicosResponseHelper::jsonError($e->getMessage());
     }
+}
+
 
     public function destroy(int $id): JsonResponse
     {

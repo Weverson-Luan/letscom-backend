@@ -13,16 +13,17 @@ return new class extends Migration
     {
         Schema::create('users_cliente', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('cliente_id');
             $table->string('email')->unique();
             $table->string('nome')->nullable();
+            $table->string("senha");
             $table->string('documento')->nullable()->unique(); // cpf ou cnpj
             $table->boolean('ativo')->default(true);
 
             $table->timestamps();
 
             // 🔗 Relacionamentos
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('cliente_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

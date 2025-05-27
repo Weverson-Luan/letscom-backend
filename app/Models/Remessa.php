@@ -13,7 +13,7 @@ class Remessa extends Model
     protected $table = 'remessas';
 
     protected $fillable = [
-        'user_id',
+        'cliente_id',
         'user_id_executor',
         'user_id_solicitante_remessa',
         'modelo_tecnico_id',

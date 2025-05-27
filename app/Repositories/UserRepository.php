@@ -52,9 +52,12 @@ class UserRepository
         return $user->delete();
     }
 
-    public function findWithPermissions($id): ?User
+    public function buscarUmUsuarioComRelacaoTipoEntrega($id): ?User
     {
-        return $this->model->with('permissions')->find($id);
+        return $this->model
+        ->with('tiposEntrega')
+        ->where('id', $id)
+        ->firstOrFail();
     }
 
     public function findByemail(string $email): ?User

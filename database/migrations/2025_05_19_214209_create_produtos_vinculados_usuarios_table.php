@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::create('produtos_vinculados_usuarios', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('cliente_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('produto_id')->constrained('produtos')->onDelete('cascade');
 
             $table->timestamps();
 
-            $table->unique(['user_id', 'produto_id']); // evita duplicação
+            $table->unique(['cliente_id', 'produto_id']); // evita duplicação
         });
     }
 
