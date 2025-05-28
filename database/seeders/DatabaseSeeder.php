@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,  // Usuários (para autenticação)
             EnderecoSeeder::class, // Criar endereços para usuários
             TiposEntregaSeeder::class, // Criar endereços para usuários
+            TipoEntregaUserSeeder::class, // Criar relacionamento tipo de entrega + usuário
             ProductSeeder::class,     // Produtos (necessário para remessas)
             TecnologiasSeeder::class, // Tecnologias [Mirafe, RFID]
             ModelosTecnicosSeeder::class, // Modelo do cliente (crachás)
@@ -24,6 +25,8 @@ class DatabaseSeeder extends Seeder
             UsuarioClienteSeeder::class, // Usuário do cliente (vedendor da letscom)
             RemessaSeeder::class,     // Remessas
             RemessaItemSeeder::class,  // Itens das remessas
+            UserSolicitanteRemessaSeeder::class, // usuários que pode solicitar remessas
+            UsersAtendimentosSeeder::class, // usuário que vão atender o cliente
             CreditSaleSeeder::class,  // Vendas de créditos
         ]);
     }

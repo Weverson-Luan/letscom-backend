@@ -8,7 +8,7 @@ class TipoEntregaRepository
 {
     public function all()
     {
-        return TipoEntrega::with(['criador', 'cliente', 'enderecoEntrega'])->get();
+        return TipoEntrega::with(['usuarios'])->get();
     }
 
     public function find($id)

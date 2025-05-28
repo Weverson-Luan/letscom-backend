@@ -8,7 +8,7 @@ use App\Services\UserService;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -19,12 +19,10 @@ class UserController extends Controller
         $this->service = $service;
     }
 
-    public function index(Request $request): JsonResponse
+    public function buscarClientes(Request $request): JsonResponse
     {
         try {
             $result = $this->service->list($request->all());
-
-
 
             return UsersResponseHelper::jsonSuccess(
                 'Usuários carregadas com sucesso!',
@@ -77,6 +75,7 @@ class UserController extends Controller
             ]);
 
             if (isset($data['roles'])) {
+                // fazendo relacionamento de uma regra com usuário
                 $user->roles()->sync([$data['roles']]);
             }
 
@@ -89,20 +88,30 @@ class UserController extends Controller
         }
     }
 
-    public function show(User $user): JsonResponse
+    public function buscarPorUmUsuario($id): JsonResponse
     {
         try {
-            // $user = $this->service->findWithPermissions($user->id);
-            return response()->json($user);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
+
+            $user = $this->service->buscarUsuarioComTipoEntrega($id);
+
+            return UsersResponseHelper::jsonSingleUser(
+                    'Usuários encontrado com sucesso!',
+                    $user ?? [],
+            );
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        return UsersResponseHelper::jsonErrorNotFoud('Usuário não encontrado.', 200);
+    }
     }
 
-    public function update(Request $request, User $user): JsonResponse
+    public function update(Request $request, $id): JsonResponse
     {
         try {
-            $success = $this->service->update($user, $request->validated());
+
+             $usuario = User::findOrFail($id);
+
+             $data = $request->all();
+
+             $success = $this->service->update($usuario, $data);
             return response()->json(['success' => $success]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);

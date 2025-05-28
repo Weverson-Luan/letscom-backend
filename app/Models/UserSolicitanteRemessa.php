@@ -13,9 +13,9 @@ class UserSolicitanteRemessa extends Model
 
     protected $fillable = [
         'remessa_id',
-        'user_id',
+        'cliente_id',
         'nome',
-        'cpf',
+        'documento',
         'telefone',
     ];
 

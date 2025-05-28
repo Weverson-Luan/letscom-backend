@@ -14,7 +14,9 @@ class CreditSale extends Model
     protected $table = 'vendas_creditos';
 
     protected $fillable = [
-        'user_id', // <-- esse é o campo correto
+        'cliente_id', // <-- esse é o campo correto
+        'user_id_executor',
+        'produto_id',
         'valor',
         'quantidade_creditos',
         'tipo_transacao',
@@ -32,5 +34,15 @@ class CreditSale extends Model
     public function client()
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function executor()
+    {
+        return $this->belongsTo(User::class, 'user_id_executor');
+    }
+
+    public function produto()
+    {
+        return $this->belongsTo(Product::class, 'produto_id');
     }
 }

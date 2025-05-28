@@ -15,7 +15,7 @@ class ModelosTecnicosSeeder extends Seeder
 
         DB::table('modelos_tecnicos')->insert([
             [
-                'user_id' => 1,
+                'cliente_id' => 1,
                 'produto_id' => 1,
                 "tecnologia_id"=> 1,
                 'nome_modelo' => 'Visitante',

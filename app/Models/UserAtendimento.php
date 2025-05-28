@@ -12,15 +12,16 @@ class UserAtendimento extends Model
     protected $table = 'users_atendimentos';
 
     protected $fillable = [
-        'user_id',
+        'cliente_id',
         'nome',
         'email',
+        'documento',
         'telefone',
     ];
 
     // Relacionamento com usuário (cliente)
     public function cliente()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'cliente_id');
     }
 }

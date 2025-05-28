@@ -44,7 +44,7 @@ class UserClienteRepository
         $query = $this->model->query();
 
         if (!empty($params['user_id'])) {
-            $query->where('user_id', $params['user_id']);
+            $query->where('cliente_id', $params['user_id']);
         }
 
         if (!empty($params['search'])) {
@@ -66,8 +66,9 @@ class UserClienteRepository
         return $this->model->create($data);
     }
 
-    public function update(UserCliente $cliente, array $data): bool
+    public function update(UserCliente $cliente, array $data)
     {
+
         return $cliente->update($data);
     }
 

@@ -65,10 +65,11 @@ return [
             'model' => App\Models\User::class,
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+         // Novo provider para users_cliente
+        'clientes_usuarios' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\UserCliente::class,
+        ],
     ],
 
     /*

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Services\TipoEntregaService;
 use Illuminate\Http\Request;
 
+use App\Helpers\TiposEntregaResponseHelper;
+
 class TipoEntregaController extends Controller
 {
     protected $service;
@@ -16,11 +18,18 @@ class TipoEntregaController extends Controller
 
     public function index()
     {
-        return response()->json($this->service->getAll());
+        $tiposEntrega = $this->service->getAll();
+
+
+        return TiposEntregaResponseHelper::jsonSuccess(
+            'Tipos de entrega carregados com sucesso!',
+            TiposEntregaResponseHelper::mapTiposEntrega($tiposEntrega)
+        );
     }
 
     public function store(Request $request)
     {
+
         $data = $request->validate([
             'user_id' => 'required|exists:users,id',
             'cliente_id' => 'required|exists:users,id',

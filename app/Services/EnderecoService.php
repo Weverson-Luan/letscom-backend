@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Repositories\EnderecoRepository;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class EnderecoService
 {
@@ -13,15 +14,38 @@ class EnderecoService
         $this->repository = $repository;
     }
 
-    public function getAll()
+    public function getAll(array $params): array
     {
-        return $this->repository->all();
+          $users = $this->repository->buscarTodosEnderecos($params);
+            return [
+                'data' => $users->items(),
+                'pagination' => [
+                    'current_page' => $users->currentPage(),
+                    'last_page' => $users->lastPage(),
+                    'per_page' => $users->perPage(),
+                    'total' => $users->total()
+                ]
+            ];
+
     }
 
     public function getById($id)
     {
         return $this->repository->find($id);
     }
+
+    /**
+     * Retorna os endereços do usuário separados por tipo (residencial e entrega).
+     *
+     * @param int $userId
+     * @param array $params
+     * @return array
+     */
+    public function buscarEnderecosSeparadosPorTipo(int $userId, array $params): array
+    {
+        return $this->repository->buscarEnderecosPorUsuarioESepararPorTipo($userId, $params);
+    }
+
 
     public function create(array $data)
     {

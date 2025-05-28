@@ -27,7 +27,7 @@ class UserRepository
             $query->where(function($q) use ($params) {
                 $q->where('nome', 'like', "%{$params['search']}%")
                   ->orWhere('email', 'like', "%{$params['search']}%")
-                  ->orWhere('cpf', 'like', "%{$params['search']}%");
+                  ->orWhere('documento', 'like', "%{$params['search']}%");
             });
         }
 
@@ -42,7 +42,7 @@ class UserRepository
         return $this->model->create($data);
     }
 
-    public function update(User $user, array $data): bool
+    public function update(User $user, array $data)
     {
         return $user->update($data);
     }
@@ -52,9 +52,29 @@ class UserRepository
         return $user->delete();
     }
 
-    public function findWithPermissions($id): ?User
+    public function buscarUmUsuarioComRelacaoTipoEntrega($id): ?User
     {
-        return $this->model->with('permissions')->find($id);
+        $usuario = $this->model
+        ->with('tiposEntrega')
+        ->where('id', $id)
+        ->firstOrFail();
+
+        // pega apenas o primeiro tipo de entrega
+        $primeiroTipoEntrega = $usuario->tiposEntrega->first();
+
+        // pega o primeiro tipo de entrega e esconde o pivot
+         if ($primeiroTipoEntrega) {
+            $primeiroTipoEntrega->makeHidden('pivot');
+        }
+
+        // remove o relacionamento original para não enviar o array completo
+         unset($usuario->tiposEntrega);
+
+         // adiciona o campo individual no retorno
+        $usuario->tipo_entrega = $primeiroTipoEntrega;
+
+        return $usuario;
+
     }
 
     public function findByemail(string $email): ?User

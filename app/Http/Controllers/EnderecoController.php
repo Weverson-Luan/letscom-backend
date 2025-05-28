@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Services\EnderecoService;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use App\Helpers\EnderecoResponseHelper;
+
 
 class EnderecoController extends Controller
 {
@@ -14,9 +17,22 @@ class EnderecoController extends Controller
         $this->service = $service;
     }
 
-    public function index()
+    public function index(Request $request):JsonResponse
     {
-        return response()->json($this->service->getAll());
+
+    $enderecos = $this->service->getAll($request->all());
+
+
+    return EnderecoResponseHelper::jsonSuccess(
+    'Lista paginada de endereços',
+    EnderecoResponseHelper::mapEnderecos($enderecos['data']),
+    [
+        'current_page' => $enderecos['pagination']['current_page'],
+        'last_page' => $enderecos['pagination']['last_page'],
+        'per_page' => $enderecos['pagination']['per_page'],
+        'total' => $enderecos['pagination']['total'],
+    ]
+    );
     }
 
     public function store(Request $request)
@@ -30,6 +46,7 @@ class EnderecoController extends Controller
         'cidade' => 'required|string',
         'estado' => 'required|string',
         'cep' => 'required|string',
+        'tipo_endereco' => 'required|string',
         'usar_mesmo_endereco_cadastrado_na_empresa' => 'boolean',
         'nome_responsavel' => 'required|string', // <- AQUI
         'email' => 'required|email',
@@ -42,7 +59,33 @@ class EnderecoController extends Controller
 
     public function show($id)
     {
-        return response()->json($this->service->getById($id));
+
+        $endereco = $this->service->getById($id);
+
+        return EnderecoResponseHelper::jsonSingleEndereco(
+            'Endereço carregado com sucesso!',
+            $endereco ?? [],
+        );
+    }
+
+    public function buscarEnderecosSeparados(Request $request, int $userId)
+    {
+        try {
+            $enderecos = $this->service->buscarEnderecosSeparadosPorTipo($userId, $request->all());
+
+            return response()->json([
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Endereços carregados com sucesso!',
+                'data' => $enderecos
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Erro ao buscar endereços.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function update(Request $request, $id)

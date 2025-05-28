@@ -10,7 +10,10 @@ return new class extends Migration
     {
         Schema::create('vendas_creditos', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
+
+            $table->unsignedBigInteger('cliente_id'); // qual cliente que fez a compra do creditos
+            $table->unsignedBigInteger('user_id_executor');
+            $table->unsignedBigInteger('produto_id');
 
             $table->decimal('valor', 10, 2);
             $table->decimal('quantidade_creditos', 10, 2);
@@ -22,7 +25,9 @@ return new class extends Migration
             $table->softDeletes();
 
             // 🔗 Relacionamentos
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('cliente_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('user_id_executor')->references('id')->on('users')->onDelete('cascade'); // reponsável por realizar a transação dos creditos
+            $table->foreign('produto_id')->references('id')->on('produtos')->onDelete('cascade');
         });
     }
 

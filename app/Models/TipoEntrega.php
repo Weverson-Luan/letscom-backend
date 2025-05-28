@@ -13,23 +13,31 @@ class TipoEntrega extends Model
 
     protected $fillable = [
         'user_id',
-        'user_cliente',
         'endereco_entrega_id',
         'tipo',
     ];
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id')
+                    ->withTimestamps();
     }
 
     public function cliente()
     {
-        return $this->belongsTo(User::class, 'cliente_id');
+        return $this->belongsTo(User::class, 'cliente_id')
+                    ->withTimestamps();
     }
 
     public function endereco()
     {
-        return $this->belongsTo(EnderecoEntrega::class, 'endereco_entrega_id');
+        return $this->belongsTo(EnderecoEntrega::class, 'endereco_entrega_id')
+                    ->withTimestamps();
     }
-}
+
+    public function usuarios()
+    {
+        return $this->belongsToMany(User::class, 'tipo_entrega_user', 'tipo_entrega_id', 'cliente_id')
+                    ->withTimestamps();
+    }
+};

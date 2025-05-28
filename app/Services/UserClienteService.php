@@ -6,6 +6,7 @@ use App\Repositories\UserClienteRepository;
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Hash;
 
 class UserClienteService
 {
@@ -34,12 +35,19 @@ class UserClienteService
 
     public function create(array $data)
     {
+        $data['senha'] = Hash::make($data['senha']); // aplica o bcrypt
+
         return $this->repository->create($data);
     }
 
     public function update($id, array $data)
     {
         $cliente = $this->repository->find($id);
+
+        if (!empty($data['senha'])) {
+            $data['senha'] = Hash::make($data['senha']);
+        }
+
         return $this->repository->update($cliente, $data);
     }
 

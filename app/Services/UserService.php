@@ -42,6 +42,12 @@ class UserService
         }
     }
 
+
+    public function buscarUsuarioComTipoEntrega(int $id): ?User
+    {
+        return $this->repository->buscarUmUsuarioComRelacaoTipoEntrega($id);
+    }
+
     /**
      * Cria um novo usuário
      */
@@ -122,49 +128,6 @@ class UserService
         return $this->repository->findWithPermissions($id);
     }
 
-    /**
-     * Verifica se o usuário tem permissão.
-     *
-     * @param string $cpf CPF do usuário
-     * @param string|null $resource Nome do recurso (módulo)
-     * @param string|null $action Ação requerida (C,R,U,D)
-     * @return bool Retorna true se o usuário tem permissão, false caso contrário
-     */
-    public function hasPermission(string $cpf, string $resource = null, string $action = null): bool
-    {
-        try {
-            $user = $this->repository->findByCpf($cpf);
-
-            if (!$user) {
-                return false;
-            }
-
-            // Se não houver recurso ou ação especificados, verifica apenas se o usuário existe
-            if (!$resource || !$action) {
-                return true;
-            }
-
-            // Converte a ação para o formato de permissão esperado
-            // Por exemplo: R -> read, C -> create, etc.
-            $permissionMap = [
-                'C' => 'create',
-                'R' => 'read',
-                'U' => 'update',
-                'D' => 'delete'
-            ];
-
-            $permission = $permissionMap[$action] ?? $action;
-
-            return $user->hasPermission($resource, $permission);
-        } catch (\Exception $e) {
-            Log::error('Erro ao verificar permissão: ' . $e->getMessage(), [
-                'cpf' => $cpf,
-                'resource' => $resource,
-                'action' => $action
-            ]);
-            return false;
-        }
-    }
 
     public function generateCpfToken(string $cpf): string
     {
