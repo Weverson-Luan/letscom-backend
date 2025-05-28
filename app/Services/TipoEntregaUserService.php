@@ -18,6 +18,12 @@ class TipoEntregaUserService
         return $this->repository->attachTipoEntregaToUser($userId, $tipoEntregaId);
     }
 
+    public function atualizarTipoEntrega(int $userId, int $tipoEntregaId)
+    {
+        // aqui pode ter outras regras antes de chamar o repository
+        return $this->repository->atualizarTipoEntregaParaUsuario($userId, $tipoEntregaId);
+    }
+
     public function listarPorUsuario(int $userId)
     {
         return $this->repository->getTiposEntregaPorUsuario($userId);

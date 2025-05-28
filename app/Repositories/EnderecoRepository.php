@@ -29,6 +29,21 @@ class EnderecoRepository
         return Endereco::with('user')->findOrFail($id);
     }
 
+    public function buscarEnderecosPorUsuarioESepararPorTipo(int $userId, array $params): array
+    {
+        $query = Endereco::where('user_id', $userId)
+            ->with('user')
+            ->orderBy($params['sort_by'] ?? 'created_at', $params['order'] ?? 'desc');
+
+        $enderecos = $query->get(); // Sem paginação aqui, pois você quer retornar dois apenas
+
+        return [
+            'residencial' => $enderecos->firstWhere('tipo_endereco', 'residencial'),
+            'entrega'     => $enderecos->firstWhere('tipo_endereco', 'entrega'),
+        ];
+    }
+
+
     public function create(array $data)
     {
         return Endereco::create($data);

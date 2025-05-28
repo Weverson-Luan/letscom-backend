@@ -43,6 +43,6 @@ class CreditSale extends Model
 
     public function produto()
     {
-        return $this->belongsTo(Produto::class, 'produto_id');
+        return $this->belongsTo(Product::class, 'produto_id');
     }
 }

@@ -54,10 +54,27 @@ class UserRepository
 
     public function buscarUmUsuarioComRelacaoTipoEntrega($id): ?User
     {
-        return $this->model
+        $usuario = $this->model
         ->with('tiposEntrega')
         ->where('id', $id)
         ->firstOrFail();
+
+        // pega apenas o primeiro tipo de entrega
+        $primeiroTipoEntrega = $usuario->tiposEntrega->first();
+
+        // pega o primeiro tipo de entrega e esconde o pivot
+         if ($primeiroTipoEntrega) {
+            $primeiroTipoEntrega->makeHidden('pivot');
+        }
+
+        // remove o relacionamento original para não enviar o array completo
+         unset($usuario->tiposEntrega);
+
+         // adiciona o campo individual no retorno
+        $usuario->tipo_entrega = $primeiroTipoEntrega;
+
+        return $usuario;
+
     }
 
     public function findByemail(string $email): ?User

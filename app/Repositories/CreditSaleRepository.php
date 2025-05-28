@@ -60,12 +60,17 @@ class CreditSaleRepository
 
         // filtro por ID do cliente
         if (!empty($params['user_id'])) {
-            $query->where('user_id', $params['user_id']);
+            $query->where('cliente_id', $params['user_id']);
         }
 
         // filtro por status (pesquisa textual)
         if (!empty($params['search'])) {
-            $query->where('status', 'like', "%{$params['search']}%");
+             $query->where(function ($q) use ($params) {
+            $q->where('status', 'like', "%{$params['search']}%")
+              ->orWhereHas('produto', function ($produtoQuery) use ($params) {
+                  $produtoQuery->where('nome', 'like', "%{$params['search']}%");
+              });
+        });
         }
 
         return $query->orderBy(

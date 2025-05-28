@@ -222,6 +222,7 @@ Route::middleware(['auth.jwt'])->group(function () {
         Route::get('/', [TipoEntregaController::class, 'index']);
         Route::get('/usuarios/{id}', [TipoEntregaUserController::class, 'listar']);
         Route::post('/vincular-tipos-entrega/users', [TipoEntregaUserController::class, 'vincular']);
+        Route::post('/atualizar/users', [TipoEntregaUserController::class, 'atualizarTipoEntrega']);
         Route::post('/', [TipoEntregaController::class, 'store']);
         Route::get('/{id}', [TipoEntregaController::class, 'show']);
         Route::put('/{id}', [TipoEntregaController::class, 'update']);
@@ -237,6 +238,7 @@ Route::middleware(['auth.jwt'])->group(function () {
      */
     Route::prefix('enderecos')->group(function () {
         Route::get('/', [EnderecoController::class, 'index']);
+        Route::get('/usuarios/{id}/enderecos-por-tipo', [EnderecoController::class, 'buscarEnderecosSeparados']);
         Route::post('/', [EnderecoController::class, 'store']);
         Route::get('/{id}', [EnderecoController::class, 'show']);
         Route::put('/{id}', [EnderecoController::class, 'update']);

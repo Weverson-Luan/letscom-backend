@@ -27,6 +27,7 @@ class RemessaController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
+
             $remessasPaginadas = $this->service->list($request->all());
 
             $data = RemessasResponseHelper::mapRemessas($remessasPaginadas->items());

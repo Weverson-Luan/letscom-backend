@@ -74,14 +74,11 @@ class UserClienteController extends Controller
 
     public function update(Request $request, $id)
     {
-        $data = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'email' => 'required|email|unique:users_cliente,email,' . $id,
-            'cliente_nome' => 'required|string|max:255',
-            'consultor_nome' => 'nullable|string|max:255',
-        ]);
+        $data = $request->all();
 
-        return response()->json($this->service->update($id, $data));
+        $resultData = $this->service->update($id, $data);
+
+        return response()->json($resultData);
     }
 
     public function destroy($id)

@@ -15,7 +15,6 @@ class EnderecoService
     }
 
     public function getAll(array $params): array
-
     {
           $users = $this->repository->buscarTodosEnderecos($params);
             return [
@@ -28,13 +27,25 @@ class EnderecoService
                 ]
             ];
 
-
     }
 
     public function getById($id)
     {
         return $this->repository->find($id);
     }
+
+    /**
+     * Retorna os endereços do usuário separados por tipo (residencial e entrega).
+     *
+     * @param int $userId
+     * @param array $params
+     * @return array
+     */
+    public function buscarEnderecosSeparadosPorTipo(int $userId, array $params): array
+    {
+        return $this->repository->buscarEnderecosPorUsuarioESepararPorTipo($userId, $params);
+    }
+
 
     public function create(array $data)
     {

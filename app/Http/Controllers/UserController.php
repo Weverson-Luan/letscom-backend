@@ -99,7 +99,7 @@ class UserController extends Controller
                     $user ?? [],
             );
     } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-        return UsersResponseHelper::jsonErrorNotFoud('Usuário não encontrado.', 404);
+        return UsersResponseHelper::jsonErrorNotFoud('Usuário não encontrado.', 200);
     }
     }
 

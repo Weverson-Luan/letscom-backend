@@ -46,6 +46,7 @@ class EnderecoController extends Controller
         'cidade' => 'required|string',
         'estado' => 'required|string',
         'cep' => 'required|string',
+        'tipo_endereco' => 'required|string',
         'usar_mesmo_endereco_cadastrado_na_empresa' => 'boolean',
         'nome_responsavel' => 'required|string', // <- AQUI
         'email' => 'required|email',
@@ -65,6 +66,26 @@ class EnderecoController extends Controller
             'Endereço carregado com sucesso!',
             $endereco ?? [],
         );
+    }
+
+    public function buscarEnderecosSeparados(Request $request, int $userId)
+    {
+        try {
+            $enderecos = $this->service->buscarEnderecosSeparadosPorTipo($userId, $request->all());
+
+            return response()->json([
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Endereços carregados com sucesso!',
+                'data' => $enderecos
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Erro ao buscar endereços.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function update(Request $request, $id)
