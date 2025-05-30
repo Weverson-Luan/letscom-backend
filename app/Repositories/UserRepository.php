@@ -37,6 +37,30 @@ class UserRepository
         )->paginate($params['per_page'] ?? 10);
     }
 
+    public function paginateUsuariosConsutores(array $params): LengthAwarePaginator
+    {
+        $query = $this->model->query();
+
+             // Filtro para buscar apenas usuários com papel de consultor
+        $query->whereHas('roles', function ($q) {
+            $q->where('nome', 'like', '%Consultor%');
+        });
+
+
+        if (!empty($params['search'])) {
+            $query->where(function($q) use ($params) {
+                $q->where('nome', 'like', "%{$params['search']}%");
+                //   ->orWhere('email', 'like', "%{$params['search']}%")
+                //   ->orWhere('documento', 'like', "%{$params['search']}%");
+            });
+        }
+
+        return $query->orderBy(
+            $params['sort_by'] ?? 'created_at',
+            $params['order'] ?? 'desc'
+        )->paginate($params['per_page'] ?? 10);
+    }
+
     public function create(array $data): User
     {
         return $this->model->create($data);

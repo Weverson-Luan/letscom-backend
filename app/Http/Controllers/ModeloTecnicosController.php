@@ -41,17 +41,27 @@ class ModeloTecnicosController extends Controller
     {
         try {
             $params = $request->all();
-            $params['user_id'] = $id;
+            $params['cliente_id'] = $id;
 
             $response = $this->service->listPorUsuario($params);
-           // Mapeia os caminhos das imagens
-            $modelos = ModeloTecnicosResponseHelper::mapModelos($response['data']);
 
-            return ModeloTecnicosResponseHelper::jsonSuccess(
-                $response['message'],
-                $modelos,
-                $response['pagination']
-            );
+            // obtém os modelos da paginação
+            $modelos = $response->items();
+
+            // mapeia os dados para o formato customizado
+            $modelosFormatados = ModeloTecnicosResponseHelper::mapModelos($modelos);
+
+        //  retorna o JSON com paginação
+        return ModeloTecnicosResponseHelper::jsonSuccess(
+            'Modelos carregados com sucesso!',
+            $modelosFormatados,
+            [
+                'current_page' => $response->currentPage(),
+                'last_page' => $response->lastPage(),
+                'per_page' => $response->perPage(),
+                'total' => $response->total(),
+            ]
+        );
         } catch (\Throwable $e) {
             Log::error('Erro ao listar modelos técnicos: ' . $e->getMessage());
             return ModeloTecnicosResponseHelper::jsonError($e->getMessage());

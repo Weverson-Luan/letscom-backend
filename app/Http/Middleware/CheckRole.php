@@ -14,7 +14,13 @@ class CheckRole
         $user = Auth::user();
 
         if (!$user || !$user->roles()->whereIn('nome', $roles)->exists()) {
-            return response()->json(['message' => 'Acesso não autorizado.'], 403);
+            return response()->json(
+                [
+                    'status'=> 403,
+                    'message' => 'Acesso não autorizado para usuário.',
+                    'data'=> null
+                ]
+                , 403);
         }
 
         return $next($request);

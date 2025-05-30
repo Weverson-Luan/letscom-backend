@@ -22,11 +22,11 @@ class DatabaseSeeder extends Seeder
             TecnologiasSeeder::class, // Tecnologias [Mirafe, RFID]
             ModelosTecnicosSeeder::class, // Modelo do cliente (crachás)
             ModelosTecnicosCamposVariaveisSeeder::class, // Campos variáveis que vão ter no modelo
-            UsuarioClienteSeeder::class, // Usuário do cliente (vedendor da letscom)
+            // UsuarioClienteSeeder::class, // Usuário do cliente (vedendor da letscom)
             RemessaSeeder::class,     // Remessas
             RemessaItemSeeder::class,  // Itens das remessas
             UserSolicitanteRemessaSeeder::class, // usuários que pode solicitar remessas
-            UsersAtendimentosSeeder::class, // usuário que vão atender o cliente
+            // UsersAtendimentosSeeder::class, // usuário que vão atender o cliente
             CreditSaleSeeder::class,  // Vendas de créditos
         ]);
     }

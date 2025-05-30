@@ -33,10 +33,10 @@ class RemessaService
         try {
             DB::beginTransaction();
 
-            $user = User::findOrFail($data['user_id']);
+            $user = User::findOrFail($data['cliente_id']);
 
             $remessa = $this->repository->create([
-                'user_id' => $user->id,
+                'cliente_id' => $user->id,
                 'user_id_solicitante_remessa' => $data['user_id_solicitante_remessa'] ?? null,
                 'user_id_executor' => $data['user_id_executor'] ?? null,
                 'modelo_tecnico_id' => $data['modelo_tecnico_id'],

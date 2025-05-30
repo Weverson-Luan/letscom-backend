@@ -23,7 +23,7 @@ class UsersResponseHelper
             $saidas = $creditSales->where('tipo_transacao', 'saida')->sum('quantidade_creditos');
 
             // buscando por consultor que vai atender o cliente ex: [Luan -> Fiat]
-            $user['consultor'] = \App\Models\UserAtendimento::where('cliente_id', $user['id'])->first();
+            $user['consultor'] = $user->consultores()->first();
 
             // buscando os usuários do cliente ex: [Fiat -> clint1, client2, WLTECH -> client]
             $user["contato"] = \App\Models\UserCliente::where('cliente_id', $user['id'])->first();

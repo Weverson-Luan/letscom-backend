@@ -34,10 +34,16 @@ class ModeloTecnicosRepository
 
     public function buscarPorCliente(array $params): LengthAwarePaginator
     {
-        $query = $this->model->query();
+        // $query = $this->model->query();
+           $query = $this->model->with([
+            'cliente:id,nome,email', // carrega apenas os campos necessários
+            'produto',
+            'tecnologia',
+            'camposVariaveis',
+            ]);
 
-        if (!empty($params['user_id'])) {
-            $query->where('user_id', $params['user_id']);
+        if (!empty($params['cliente_id'])) {
+            $query->where('cliente_id', $params['cliente_id']);
         }
 
         if (!empty($params['search'])) {

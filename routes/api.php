@@ -164,6 +164,7 @@ Route::middleware(['auth.jwt'])->group(function () {
      */
     Route::prefix('users')->group(function () {
         Route::get('/', [UserController::class, 'buscarClientes']);
+        Route::get('/consultores', [UserController::class, 'buscarUsuariosConsultores']);
         Route::post('/', [UserController::class, 'store']);
         Route::get('/{user}', [UserController::class, 'buscarPorUmUsuario']);
         Route::put('/{user}', [UserController::class, 'update']);
