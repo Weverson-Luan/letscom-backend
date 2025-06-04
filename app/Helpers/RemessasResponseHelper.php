@@ -61,6 +61,7 @@ class RemessasResponseHelper
                 'id' => $remessa->id,
                 'total_solicitacoes' => $remessa->total_solicitacoes,
                 'situacao' => $remessa->situacao,
+                'status' => $remessa->status,
                 'data_remessa' => $remessa->data_remessa,
                 'data_inicio_producao' => $remessa->data_inicio_producao,
                 'posicao' => $remessa->posicao,

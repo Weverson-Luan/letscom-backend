@@ -90,6 +90,11 @@ class ModeloTecnicosService
         }
     }
 
+    public function buscarModeloPorCliente(array $params)
+    {
+        return $this->repository->buscarModeloPorCliente($params);
+    }
+
 
     public function find(int $id): ModeloTecnico
     {

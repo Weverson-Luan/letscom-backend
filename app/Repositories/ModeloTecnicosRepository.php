@@ -59,6 +59,36 @@ class ModeloTecnicosRepository
         )->paginate($params['per_page'] ?? 10);
     }
 
+    public function buscarModeloPorCliente(array $params)
+    {
+        $query = $this->model->with([
+            'cliente:id,nome,email',
+            'produto',
+            'tecnologia',
+            'camposVariaveis',
+        ]);
+
+        if (!empty($params['id'])) {
+            $query->where('id', $params['id']);
+        }
+
+        if (!empty($params['cliente_id'])) {
+            $query->where('cliente_id', $params['cliente_id']);
+        }
+
+        if (!empty($params['search'])) {
+            $query->where(function ($q) use ($params) {
+                $q->where('nome', 'like', "%{$params['search']}%")
+                ->orWhere('nome_modelo', 'like', "%{$params['search']}%");
+            });
+        }
+
+        return $query->orderBy(
+            $params['sort_by'] ?? 'created_at',
+            $params['order'] ?? 'desc'
+        )->first();
+    }
+
 
     public function create(array $data): ModeloTecnico
     {
@@ -72,7 +102,8 @@ class ModeloTecnicosRepository
 
     public function update($id, array $data)
     {
-       $modelo = $this->find(2);
+       $modelo = $this->model->findOrFail($id); // garante que não seja null
+
        $modelo->update($data);
         return $modelo;
     }

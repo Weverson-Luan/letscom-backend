@@ -66,7 +66,7 @@ class RemessaRepository
 
         return $query
             ->when(!empty($params['search']), function ($q) use ($params) {
-                $q->whereHas('client', function ($query) use ($params) {
+                $q->whereHas('cliente', function ($query) use ($params) {
                     $query->where('nome', 'like', '%' . $params['search'] . '%');
                 });
             })
@@ -96,21 +96,23 @@ class RemessaRepository
     public function getRemessasDisponiveisParaProducao(array $params): LengthAwarePaginator
     {
         $query = $this->model
-            ->with(['tecnologia', 'modeloTecnico', 'user'])
-            ->where('situacao', 'pendente')
+            ->with(['tecnologia', 'modeloTecnico', 'cliente'])
+            ->where('status', 'solicitado') // ← garante que sejam remessas em expedição
             ->whereNull('user_id_executor'); // ← garante que não foi atribuida a aoguem
 
         /**
          * QUANDO FRONT END MANDAR O CAMPO SEARCH
          */
-        $query->when(!empty($params['search']), function ($q) use ($params) {
-            $q->where(function ($sub) use ($params) {
-                $sub->where('situacao', 'like', '%' . $params['search'] . '%')
-                 ->orWhere('id', $params['search']) // busca por ID exato
-                 ->orWhereHas('user', function ($query) use ($params) {
-                $query->where('nome', 'like', '%' . $params['search'] . '%');
-            });
-            });
+        $query->where(function ($q) use ($params) {
+            $search = $params['search'] ?? null;
+
+            if (!empty($search)) {
+                $q->where('situacao', 'like', "%{$search}%")
+                ->orWhere('id', $search)
+                ->orWhereHas('cliente', function ($query) use ($search) {
+                    $query->where('nome', 'like', "%{$search}%");
+                });
+            }
         });
 
         /**
@@ -128,7 +130,7 @@ class RemessaRepository
         $userAutenticado = auth()->user();
 
         $query = $this->model
-            ->with(['tecnologia', 'modeloTecnico', 'user'])
+            ->with(['tecnologia', 'modeloTecnico', 'cliente'])
             ->whereNotNull('user_id_executor') // ← garante que só retorne tarefas já atribuídas
             ->where('situacao', 'em_producao'); // ← garante que estejam em produção
 
@@ -151,7 +153,7 @@ class RemessaRepository
             $q->where(function ($sub) use ($params) {
                 $sub->where('situacao', 'like', '%' . $params['search'] . '%')
                     ->orWhere('id', $params['search']) // busca direta por ID
-                    ->orWhereHas('user', function ($query) use ($params) {
+                    ->orWhereHas('cliente', function ($query) use ($params) {
                         $query->where('nome', 'like', '%' . $params['search'] . '%');
                     });
             });

@@ -132,6 +132,8 @@ Route::middleware(['auth.jwt'])->group(function () {
     Route::prefix('modelo-tecnico')->group(function () {
         Route::get('/', [ModeloTecnicosController::class, 'index'])->middleware('role:admin,cliente,producao');
         Route::get('/clientes/{id}', [ModeloTecnicosController::class, 'buscarPorUsuarios'])->middleware('role:admin,cliente,producao');
+        Route::get('/cliente/unico/{id}', [ModeloTecnicosController::class, 'buscarModeloUnico'])->middleware('role:admin,cliente,producao');
+
         Route::post('/', [ModeloTecnicosController::class, 'store'])->middleware('role:admin,cliente,producao');
         Route::get('/{id}', [ModeloTecnicosController::class, 'show']);
         Route::post('/{id}', [ModeloTecnicosController::class, 'atualizarModelo'])->middleware('role:admin,cliente,producao');
@@ -148,10 +150,10 @@ Route::middleware(['auth.jwt'])->group(function () {
      */
     Route::prefix('modelos-tecnicos-campos-variaveis')->group(function () {
         Route::get('/', [ModelosTecnicosCamposVariaveisController::class, 'index']);
-        Route::post('/', [ModelosTecnicosCamposVariaveisController::class, 'store'])->middleware('role:admin,cliente');
+        Route::post('/', [ModelosTecnicosCamposVariaveisController::class, 'store'])->middleware('role:admin,cliente,producao');
         Route::get('/{id}', [ModelosTecnicosCamposVariaveisController::class, 'show']);
-        Route::put('/{id}', [ModelosTecnicosCamposVariaveisController::class, 'update'])->middleware('role:admin,cliente');
-        Route::delete('/{id}', [ModelosTecnicosCamposVariaveisController::class, 'destroy'])->middleware('role:admin,cliente');
+        Route::put('/{id}', [ModelosTecnicosCamposVariaveisController::class, 'update'])->middleware('role:admin,cliente,producao');
+        Route::delete('/{id}', [ModelosTecnicosCamposVariaveisController::class, 'destroy'])->middleware('role:admin,cliente,producao');
     });
 
 

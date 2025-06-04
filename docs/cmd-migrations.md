@@ -24,6 +24,13 @@
     php artisan migrate:fresh
     ```
 
+1. **Rode as seeders:**
+
+    ```bash
+    php artisan db:seed
+    php artisan db:seed --class=UserSeeder
+    ```
+
 user ->
 produto ->
 tecnologia ->

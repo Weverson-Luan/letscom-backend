@@ -66,7 +66,7 @@ class RemessaController extends Controller
             );
         } catch (\Throwable $e) {
             Log::error('Erro ao listar remessas disponíveis: ' . $e->getMessage());
-            return RemessasResponseHelper::jsonError('Erro ao carregar remessas disponíveis.');
+            return RemessasResponseHelper::jsonError($e->getMessage());
         }
     }
 
@@ -141,8 +141,12 @@ class RemessaController extends Controller
 
             $data = $request->all();
 
-             // adiciona o user logado como executor
-            $data['user_id_executor'] = $userIdExecutouTarefa;
+        //    // Apenas define o executor se ainda não foi atribuído
+        //     if (is_null($remessa->user_id_executor)) {
+        //         $data['user_id_executor'] = $userIdExecutouTarefa;
+        //     } else {
+        //         $data['user_id_executor'] = $remessa->user_id_executor; // mantém o valor original
+        //     }
 
             $success = $this->service->update($remessa, $data);
 

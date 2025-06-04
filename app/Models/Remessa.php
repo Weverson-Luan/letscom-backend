@@ -33,11 +33,9 @@ class Remessa extends Model
     ];
 
     // 🔗 Relacionamentos
-
-    public function user()
+    public function cliente()
     {
-        //defina um relacionamento inverso de um para um ou de muitos.
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'cliente_id');
     }
 
     public function executor()
@@ -49,7 +47,6 @@ class Remessa extends Model
     {
         return $this->belongsTo(UsersSolicitanteRemessa::class, 'solicitante_remessa_user_id');
     }
-
 
 
     public function modeloTecnico()

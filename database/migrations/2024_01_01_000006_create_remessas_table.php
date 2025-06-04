@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('tecnologia_id'); // tecnologia da remessa
 
             $table->integer('total_solicitacoes')->default(0);
-            $table->enum('situacao', ['pendente', 'em_producao', 'pronto para imprimir', 'concluida', 'cancelada'])->default('pendente');
+            $table->enum('situacao', ['pendente', 'em_producao', 'pronto para imprimir', 'concluida', 'cancelada', 'error', 'duplicidade', 'a fazer', 'a aprovar','enviar pdf'])->default('pendente');
             $table->string("status")->default("pendente");
             $table->boolean('ativo')->default(true);
             $table->string("observacao")->nullable();
