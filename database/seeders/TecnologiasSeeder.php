@@ -53,6 +53,13 @@ class TecnologiasSeeder extends Seeder
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ],
+            [
+                'nome' => 'Nenhuma Tecnologia',
+                'descricao' => 'Nenhum tipo de tecnologia para o cartão.',
+                'ativo' => true,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
         ]);
     }
 }
