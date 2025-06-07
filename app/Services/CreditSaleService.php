@@ -67,7 +67,7 @@ class CreditSaleService
         try {
             DB::beginTransaction();
 
-            $data['status'] = 'confirmado';
+            // $data['status'] = 'confirmado';
             $data['data_venda'] = now();
 
             // ✅ Atualiza estoque do produto se fornecido produto_id

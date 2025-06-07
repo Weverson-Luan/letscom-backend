@@ -48,22 +48,31 @@ class ModelosTecnicosCamposVariaveisService
     /**
      * Cria um novo campo variável
      */
-    public function create(array $data): array
-    {
-        $itensCriados = [];
+public function create(array $data): array
+{
+    $itensCriados = [];
 
-        $campos = $data['campos'] ?? [];
+    $campos = $data['campos'] ?? [];
 
-        foreach ($campos as $item) {
-            $itensCriados[] = ModelosTecnicosCamposVariaveis::create([
-                'modelo_tecnico_id' => $item['modelo_tecnico_id'],
-                'nome' => $item['nome'],
-                'obrigatorio' => $item['obrigatorio'] ?? false,
-            ]);
+    foreach ($campos as $item) {
+        // Se foi enviado um ID e ele já existe, ignoramos
+        if (!empty($item['id'])) {
+            $existe = ModelosTecnicosCamposVariaveis::where('id', $item['id'])->exists();
+            if ($existe) {
+                continue; // já existe, pula para o próximo
+            }
         }
-
-        return $itensCriados;
+        //Cria apenas se não tem id ou não existe no banco
+        $itensCriados[] = ModelosTecnicosCamposVariaveis::create([
+            'modelo_tecnico_id' => $item['modelo_tecnico_id'],
+            'nome' => $item['nome'],
+            'obrigatorio' => $item['obrigatorio'] ?? false,
+        ]);
     }
+
+    return $itensCriados;
+}
+
     /**
      * Atualiza um campo variável
      */

@@ -20,6 +20,26 @@ class ProductSeeder extends Seeder
             'estoque_atual' => 500
         ]);
 
+        Product::create([
+            'nome' => 'Cartão Híbrido',
+            'tecnologia' => 'RFID',
+            'valor' => 15.00,
+            'valor_creditos' => 1.50,
+            'estoque_minimo' => 100,
+            'estoque_maximo' => 1000,
+            'estoque_atual' => 500
+        ]);
+
+        Product::create([
+            'nome' => 'CREDENCIAL 4X4',
+            'tecnologia' => 'NFC',
+            'valor' => 25.00,
+            'valor_creditos' => 2.50,
+            'estoque_minimo' => 50,
+            'estoque_maximo' => 500,
+            'estoque_atual' => 75
+        ]);
+
         // Produto premium com estoque baixo
         Product::create([
             'nome' => 'Cartão Fosco',
@@ -62,6 +82,17 @@ class ProductSeeder extends Seeder
             'estoque_minimo' => 100,
             'estoque_maximo' => 800,
             'estoque_atual' => 120
+        ]);
+
+           // Produto econômico com estoque crítico
+        Product::create([
+            'nome' => 'Chip RFID',
+            'tecnologia' => 'Mifare 13,56kHz',
+            'valor' => 5.00,
+            'valor_creditos' => 1.00,
+            'estoque_minimo' => 50,
+            'estoque_maximo' => 200,
+            'estoque_atual' => 100
         ]);
     }
 }

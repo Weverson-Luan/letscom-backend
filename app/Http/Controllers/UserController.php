@@ -35,55 +35,69 @@ class UserController extends Controller
         }
     }
 
-    public function store(Request $data): JsonResponse
+    public function buscarUsuariosConsultores(Request $request): JsonResponse
     {
         try {
-            // Validação manual
-            $validator = validator($data->all(), [
-                'nome' => 'required|string|max:255',
-                'email' => 'required|email|unique:users,email',
-                'senha' => 'required|string|min:6',
-                'roles' => 'nullable|integer|exists:roles,id',
-            ], [
-                'email.unique'=> "Este e-mail já está em uso por outro usuário!"
-            ]);
+            $result = $this->service->listUsuariosConsultores($request->all());
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'message' => 'Erro de validação.',
-                    'errors' => $validator->errors(),
-                ], 422);
-            }
+            return UsersResponseHelper::jsonSuccess(
+                'Usuários consultores carregados com sucesso!',
+                $result['data'] ?? [],
+                $result['pagination'] ?? null,
 
-            // Verifica se o usuário já existe pelo e-mail
-            $userAlreadExists = User::where('email', $data['email'])->first();
-
-            if ($userAlreadExists) {
-                return response()->json([
-                    'message' => 'Já existe um usuário com este e-mail.'
-                ], 409); // 409 Conflict
-            }
-
-            $user = User::create([
-                'nome' => $data['nome'],
-                'email' => $data['email'],
-                'senha' => bcrypt($data['senha']),
-                'documento' => $data['documento'],
-                "ativo"=> $data['ativo'],
-                'tipo_pessoa' => $data['tipo_pessoa'],
-                "telefone"=> $data['telefone']
-            ]);
-
-            if (isset($data['roles'])) {
-                // fazendo relacionamento de uma regra com usuário
-                $user->roles()->sync([$data['roles']]);
-            }
-
-            return response()->json($user, 201);
+            );
         } catch (\Exception $e) {
+            return UsersResponseHelper::jsonError($e->getMessage());
+        }
+    }
+
+    public function store(Request $request): JsonResponse
+    {
+
+        // VALIDAÇÃO DOS CAMPOS VINDO BODY
+        $validator = validator($request->all(), [
+            'nome' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'documento' => 'required|string|unique:users,documento',
+            'telefone' => 'required|string|unique:users,telefone',
+            'tipo_pessoa' => 'required|in:F,J',
+            'senha' => 'required|string|min:6',
+            'roles' => 'nullable|integer|exists:roles,id',
+            'consultor_id' => 'nullable|integer|exists:users,id',
+            'tipo_entrega_id' => 'nullable|integer|exists:tipos_entrega,id',
+        ], [
+            'email.unique'=> "Este e-mail já está em uso por outro usuário!",
+            'documento.unique' => 'Este documento já está em uso por outro usuário!',
+            'telefone.unique' => 'Este telefone já está em uso por outro usuário!',
+            'consultor_id' => "O id do consultor não foi encontrado!",
+            'tipo_entrega_id' => "O id do tipo de entrega não foi encontrado!"
+        ]);
+
+
+        // VALIDANDO PARA VER SE NÃO HOUVE ERROR NA VALIDAÇÃO ANTERIOR
+        if ($validator->fails()) {
             return response()->json([
-                'error' => 'Erro inesperado.',
-                'details' => $e->getMessage(),
+                'code' => 422,
+                'message' => 'Erro de validação dos dados informados!',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        try {
+            // CHAMANDO O SERVICO QUE FAZ A CRIAÇÃO
+            $user = $this->service->create($request->all());
+
+            // RESPONDENDO PARA O CLIENTE
+            return response()->json([
+                'message' => 'Usuário criado com sucesso!',
+                'data' => $user
+            ], 201);
+
+        } catch (\Exception $e) {
+            // RESPONDENDO PARA O CLIENTE COM ERROR 500
+            return response()->json([
+                'message' => 'Erro ao criar o usuário.',
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -98,9 +112,9 @@ class UserController extends Controller
                     'Usuários encontrado com sucesso!',
                     $user ?? [],
             );
-    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-        return UsersResponseHelper::jsonErrorNotFoud('Usuário não encontrado.', 200);
-    }
+            } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+                return UsersResponseHelper::jsonErrorNotFoud('Usuário não encontrado.', 200);
+            }
     }
 
     public function update(Request $request, $id): JsonResponse

@@ -11,20 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users_atendimentos', function (Blueprint $table) {
+        Schema::create('cliente_consultor', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('cliente_id');// cliente que esse usuário vai atender
-            $table->string('nome')->nullable(); // nome do atendente
-            $table->string('email')->unique(); // e-mail do atendente
-            $table->string("telefone");
-            $table->string('documento')->nullable()->unique(); // cpf ou cnpj
-            $table->boolean('ativo')->default(true);
+             $table->unsignedBigInteger('cliente_id');   // usuario com papel "cliente"
+             $table->unsignedBigInteger('consultor_id'); // usuario com papel "consultor"
+
 
             $table->timestamps();
 
             // 🔗 Relacionamentos
             $table->foreign('cliente_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('consultor_id')->references('id')->on('users')->onDelete('cascade');
+
+            $table->unique(['cliente_id', 'consultor_id']); // evita duplicidade
         });
     }
 
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users_atendimentos');
+        Schema::dropIfExists('cliente_consultor');
     }
 };

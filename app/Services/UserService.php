@@ -42,6 +42,29 @@ class UserService
         }
     }
 
+        /**
+     * Lista usuários com paginação
+     */
+    public function listUsuariosConsultores(array $params): array
+    {
+        try {
+
+            $users = $this->repository->paginateUsuariosConsutores($params);
+            return [
+                'data' => $users->items(),
+                'pagination' => [
+                    'current_page' => $users->currentPage(),
+                    'last_page' => $users->lastPage(),
+                    'per_page' => $users->perPage(),
+                    'total' => $users->total()
+                ]
+            ];
+        } catch (\Exception $e) {
+            Log::error('Erro ao listar usuários: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
 
     public function buscarUsuarioComTipoEntrega(int $id): ?User
     {
@@ -54,39 +77,41 @@ class UserService
     public function create(array $data): User
     {
         try {
-            // // Hash da senha
-            // if (isset($data['senha'])) {
-            //     $data['senha'] = Hash::make($data['senha']);
-            // }
+            if (isset($data['senha'])) {
+                $data['senha'] = bcrypt($data['senha']);
+            }
 
-            // // Extrai e remove roles do payload
-            // $roles = $data['roles'] ?? null;
-            // unset($data['roles']);
+            // extrai campos especiais
+            $roles = $data['roles'] ?? null;
 
-            // // Cria o usuário
-            // $user = $this->repository->create($data);
+            $consultorId = $data['consultor_id'] ?? null;
 
-            // // Associa roles se fornecidas
-            // if ($roles) {
-            //     // Aceita string ("admin") ou ID (1), ou array misto
-            //     $roleIds = collect(is_array($roles) ? $roles : [$roles])
-            //         ->map(function ($role) {
-            //             if (is_numeric($role)) {
-            //                 return (int) $role;
-            //             }
+            $tipoEntregaId = $data['tipo_entrega_id'] ?? null;
 
-            //             return Role::where('name', $role)->value('id');
-            //         })
-            //         ->filter(); // remove nulls
+            unset($data['roles'], $data['consultor_id']);
 
-            //     $user->roles()->sync($roleIds);
-            // }
+            // Cria o usuário
+            $user = $this->repository->create($data);
 
-            return ["ok"=> "kk"];
+            // Associa role
+            if ($roles) {
+                $user->roles()->sync([$roles]);
+            }
 
+            // Relaciona ao consultor (tabela cliente_consultor)
+            if ($consultorId) {
+                $user->consultores()->syncWithoutDetaching([$consultorId]);
+            }
+
+            // Relaciona ao tipo de entrega (tabela usuario_tipo_entrega)
+            if( $tipoEntregaId) {
+                $user->tiposEntrega()->syncWithoutDetaching([$tipoEntregaId]);
+            }
+
+            return $user;
         } catch (\Exception $e) {
             Log::error('Erro ao criar usuário: ' . $e->getMessage());
-            throw $e;
+            throw new \Exception($e->getMessage());
         }
     }
 

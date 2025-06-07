@@ -54,15 +54,16 @@ class RemessasResponseHelper
     public static function mapRemessas(array $remessas): array
     {
         return array_map(function ($remessa) {
-                  $dataRemessa = Carbon::parse($remessa->data_remessa);
+                  $dataRemessa = Carbon::parse($remessa->created_at);
                   $diasCorridos = $dataRemessa->diffInDays(Carbon::now());
 
             return [
                 'id' => $remessa->id,
                 'total_solicitacoes' => $remessa->total_solicitacoes,
                 'situacao' => $remessa->situacao,
-                'data_remessa' => $remessa->data_remessa,
+                'status' => $remessa->status,
                 'data_inicio_producao' => $remessa->data_inicio_producao,
+                'data_fim_producao' => $remessa->data_fim_producao,
                 'posicao' => $remessa->posicao,
                 'observacao'=> $remessa->observacao,
                 'tecnologia' => $remessa->tecnologia,

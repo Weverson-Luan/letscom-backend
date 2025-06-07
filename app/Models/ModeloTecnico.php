@@ -23,5 +23,27 @@ class ModeloTecnico extends Model
         'foto_verso_path',
         'observacoes',
     ];
+
+
+    public function cliente()
+    {
+        // relacionamento com o cliente o modelo tecnico pertence a um cliente
+        return $this->belongsTo(\App\Models\User::class, 'cliente_id');
+    }
+    public function produto()
+    {
+        // relacionamento com o produto o modelo tecnico pertence a um produto
+        return $this->belongsTo(\App\Models\Product::class, 'produto_id');
+    }
+    public function tecnologia()
+    {
+        // relacionamento com a tecnologia o modelo tecnico pertence a uma tecnologia
+        return $this->belongsTo(\App\Models\Tecnologias::class, 'tecnologia_id');
+    }
+    public function camposVariaveis()
+    {
+        // relacionamento com os campos variaveis o modelo tecnico tem muitos campos variaveis
+        return $this->hasMany(\App\Models\ModelosTecnicosCamposVariaveis::class, 'modelo_tecnico_id');
+    }
 }
 

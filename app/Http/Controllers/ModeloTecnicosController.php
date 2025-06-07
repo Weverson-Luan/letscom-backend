@@ -41,22 +41,60 @@ class ModeloTecnicosController extends Controller
     {
         try {
             $params = $request->all();
-            $params['user_id'] = $id;
+            $params['cliente_id'] = $id;
 
             $response = $this->service->listPorUsuario($params);
-           // Mapeia os caminhos das imagens
-            $modelos = ModeloTecnicosResponseHelper::mapModelos($response['data']);
 
-            return ModeloTecnicosResponseHelper::jsonSuccess(
-                $response['message'],
-                $modelos,
-                $response['pagination']
-            );
+            // obtém os modelos da paginação
+            $modelos = $response->items();
+
+            // mapeia os dados para o formato customizado
+            $modelosFormatados = ModeloTecnicosResponseHelper::mapModelos($modelos);
+
+        //  retorna o JSON com paginação
+        return ModeloTecnicosResponseHelper::jsonSuccess(
+            'Modelos carregados com sucesso!',
+            $modelosFormatados,
+            [
+                'current_page' => $response->currentPage(),
+                'last_page' => $response->lastPage(),
+                'per_page' => $response->perPage(),
+                'total' => $response->total(),
+            ]
+        );
         } catch (\Throwable $e) {
             Log::error('Erro ao listar modelos técnicos: ' . $e->getMessage());
             return ModeloTecnicosResponseHelper::jsonError($e->getMessage());
         }
     }
+
+    public function buscarModeloUnico(int $id, Request $request): JsonResponse
+    {
+        try {
+            $params = $request->only(['cliente_id', 'search', 'sort_by', 'order']);
+            $params['id'] = $id;
+
+            $modelo = $this->service->buscarModeloPorCliente($params);
+
+            if (!$modelo) {
+                return ModeloTecnicosResponseHelper::jsonError('Modelo técnico não encontrado.', 404);
+            }
+
+            $modeloFormatado = ModeloTecnicosResponseHelper::mapModelo($modelo);
+
+            return ModeloTecnicosResponseHelper::jsonSuccess(
+                'Modelo técnico encontrado com sucesso.',
+                $modeloFormatado
+            );
+
+        } catch (\Throwable $th) {
+            return ModeloTecnicosResponseHelper::jsonError(
+                'Erro ao buscar modelo técnico.',
+                500
+            );
+        }
+    }
+
 
     public function store(Request $request): JsonResponse
     {
@@ -101,14 +139,11 @@ class ModeloTecnicosController extends Controller
     }
 
 
-public function atualizarModelo(Request $request, int $id): JsonResponse
+   public function atualizarModelo(Request $request, int $id): JsonResponse
 {
     try {
-
-
         $data = $request->all();
 
-        // Salva imagens se forem enviadas
         if ($request->hasFile('foto_frente')) {
             $data['foto_frente_path'] = $request->file('foto_frente')->store('modelos/frente', 'public');
         }
@@ -119,15 +154,15 @@ public function atualizarModelo(Request $request, int $id): JsonResponse
 
         $modelo = $this->service->atualizarModelo($id, $data);
 
-        return ModeloTecnicosResponseHelper::jsonSuccess(
-            'Modelo atualizado com sucesso.',
-            $modelo
-        );
+        return ModeloTecnicosResponseHelper::jsonSuccess('Modelo atualizado com sucesso.', $modelo);
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        return ModeloTecnicosResponseHelper::jsonError('Modelo técnico não encontrado.', 404);
     } catch (\Throwable $e) {
         Log::error('Erro ao atualizar modelo técnico: ' . $e->getMessage());
-        return ModeloTecnicosResponseHelper::jsonError($e->getMessage());
+        return ModeloTecnicosResponseHelper::jsonError('Erro ao atualizar modelo técnico.', 500);
     }
 }
+
 
 
     public function destroy(int $id): JsonResponse

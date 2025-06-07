@@ -46,6 +46,7 @@ class ModeloTecnicosService
                     'id' => $modelo->id,
                     'nome_modelo' => $modelo->nome_modelo,
                     'tipo_entrega' => $modelo->tipo_entrega,
+                    "tipo_furo"=> $modelo->tipo_furo,
                     'posicionamento' => $modelo->posicionamento,
                     'tem_furo' => $modelo->tem_furo,
                     'tem_carga_foto' => $modelo->tem_carga_foto,
@@ -79,52 +80,19 @@ class ModeloTecnicosService
         }
     }
 
-    public function listPorUsuario(array $params): array
+    public function listPorUsuario(array $params): LengthAwarePaginator
     {
         try {
-            $modelosPaginados = $this->repository->buscarPorCliente($params);
-            $data = [];
-
-            foreach ($modelosPaginados->items() as $modelo) {
-                $camposVariaveis = ModelosTecnicosCamposVariaveis::where('modelo_tecnico_id', $modelo->id)->get();
-                $produto = Product::find($modelo->produto_id);
-                $cliente = User::find($modelo->user_id);
-
-                $data[] = [
-                    'id' => $modelo->id,
-                    'nome_modelo' => $modelo->nome_modelo,
-                    'tipo_entrega' => $modelo->tipo_entrega,
-                    'posicionamento' => $modelo->posicionamento,
-                    'tem_furo' => $modelo->tem_furo,
-                    'tem_carga_foto' => $modelo->tem_carga_foto,
-                    'tem_dados_variaveis' => $modelo->tem_dados_variaveis,
-                    'campo_chave' => $modelo->campo_chave,
-                    'foto_frente_path' => $modelo->foto_frente_path,
-                    'foto_verso_path' => $modelo->foto_verso_path,
-                    'observacoes' => $modelo->observacoes,
-                    'cliente' => $cliente ?? null,
-                    'produtos' => $produto ?? null,
-                    'campos_variaveis' => $camposVariaveis,
-                    'created_at' => $modelo->created_at,
-                    'updated_at' => $modelo->updated_at,
-                ];
-            }
-
-            return [
-                'code' => 200,
-                'message' => 'Modelos carregados com sucesso!',
-                'data' => $data,
-                'pagination' => [
-                    'current_page' => $modelosPaginados->currentPage(),
-                    'last_page' => $modelosPaginados->lastPage(),
-                    'per_page' => $modelosPaginados->perPage(),
-                    'total' => $modelosPaginados->total(),
-                ],
-            ];
+           return $modelosPaginados = $this->repository->buscarPorCliente($params);
         } catch (\Throwable $e) {
             Log::error('Erro ao listar modelos técnicos por usuário: ' . $e->getMessage());
             throw $e;
         }
+    }
+
+    public function buscarModeloPorCliente(array $params)
+    {
+        return $this->repository->buscarModeloPorCliente($params);
     }
 
 

@@ -46,11 +46,20 @@ class ModelosTecnicosCamposVariaveisController extends Controller
             ]);
         } catch (\Throwable $e) {
             \Log::error('Erro ao criar campos variáveis: ' . $e->getMessage());
+        // Tratamento de erro de chave estrangeira
+            if ($e->getCode() === '23000') {
+                return response()->json([
+                    'code' => 400,
+                    'status' => 'error',
+                    'message' => 'O modelo técnico informado não existe. Verifique o ID e tente novamente.',
+                    'data' => [],
+                ], 400);
+            }
 
             return response()->json([
                 'code' => 500,
                 'status' => 'error',
-                'message' => 'Erro ao criar campos variáveis',
+                'message' => $e->getMessage(),
                 'data' => [],
                 'pagination' => null
             ], 500);

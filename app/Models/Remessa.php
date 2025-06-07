@@ -22,48 +22,59 @@ class Remessa extends Model
         'situacao',
         'status',
         'observacao',
-        'data_remessa',
-        'data_inicio_producao',
+        'data_fim_producao', // data que finalizou a produção da remessa
+        'data_inicio_producao', // data que iniciou a produção da remessa
         'posicao'
     ];
 
     protected $casts = [
-        'data_remessa' => 'datetime',
+        'data_fim_producao' => 'datetime',
         'data_inicio_producao' => 'datetime',
     ];
 
     // 🔗 Relacionamentos
-
-    public function user()
+    public function cliente()
     {
-        //defina um relacionamento inverso de um para um ou de muitos.
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'cliente_id');
     }
 
+    /**
+     * Reponsável por pegar a remessa para produzir
+     */
     public function executor()
     {
         return $this->belongsTo(User::class, 'executor_user_id');
     }
 
+    /**
+     * Responsável que fez o pedido da remessa
+     */
     public function solicitanteRemessa()
     {
         return $this->belongsTo(UsersSolicitanteRemessa::class, 'solicitante_remessa_user_id');
     }
 
-
-
+    /**
+     * Qual modelo que foi feito a remessa
+     */
     public function modeloTecnico()
     {
         //defina um relacionamento inverso de um para um ou de muitos.
         return $this->belongsTo(ModeloTecnico::class);
     }
 
+    /**
+     * Qual tecnologia foi pedida para a produção da remessa
+     */
     public function tecnologia()
     {
         //defina um relacionamento inverso de um para um ou de muitos.
         return $this->belongsTo(Tecnologias::class);
     }
 
+    /**
+     * Quais items estão relacionado com a remessa
+     */
     public function items()
     {
         return $this->hasMany(RemessaItem::class);

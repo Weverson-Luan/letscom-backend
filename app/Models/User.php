@@ -54,18 +54,45 @@ class User extends Authenticatable
     ];
 
 
+    /**
+     * Regras (papel) vinculados a este usuário.
+     */
     public function roles(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'role_user', 'user_id', 'role_id');
 
     }
 
+     /**
+     * Clientes atendidos por este consultor.
+     */
+    public function clientes(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'cliente_consultor', 'consultor_id', 'cliente_id')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Consultores vinculados a este cliente.
+     */
+    public function consultores(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'cliente_consultor', 'cliente_id', 'consultor_id')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Produto vinculado a este cliente.
+     */
     public function produtosVinculados(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'produtos_vinculados_usuarios', 'cliente_id', 'produto_id')
                     ->withTimestamps();
     }
 
+    /**
+     * Tipo de entrega vinculado a este cliente.
+     */
     public function tiposEntrega()
     {
         return $this->belongsToMany(TipoEntrega::class, 'tipo_entrega_user', 'cliente_id', 'tipo_entrega_id')
