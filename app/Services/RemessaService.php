@@ -43,8 +43,8 @@ class RemessaService
                 'tecnologia_id' => $data['tecnologia_id'],
                 'total_solicitacoes' => $data['total_solicitacoes'],
                 'situacao' => $data['situacao'],
-                'data_remessa' => $data['data_remessa'],
-                'data_inicio_producao' => $data['data_inicio_producao'],
+                'data_fim_producao' => $data['data_fim_producao'] ?? null,
+                'data_inicio_producao' => $data['data_inicio_producao'] ?? null,
                 'posicao' => $data['posicao'],
             ]);
 

@@ -27,7 +27,8 @@ class UserRepository
             $query->where(function($q) use ($params) {
                 $q->where('nome', 'like', "%{$params['search']}%")
                   ->orWhere('email', 'like', "%{$params['search']}%")
-                  ->orWhere('documento', 'like', "%{$params['search']}%");
+                  ->orWhere('documento', 'like', "%{$params['search']}%")
+                  ->orWhere('telefone', 'like', "%{$params['search']}%");
             });
         }
 
@@ -50,8 +51,6 @@ class UserRepository
         if (!empty($params['search'])) {
             $query->where(function($q) use ($params) {
                 $q->where('nome', 'like', "%{$params['search']}%");
-                //   ->orWhere('email', 'like', "%{$params['search']}%")
-                //   ->orWhere('documento', 'like', "%{$params['search']}%");
             });
         }
 

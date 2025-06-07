@@ -21,8 +21,8 @@ class ModeloTecnicosRepository
 
         if (!empty($params['search'])) {
             $query->where(function($q) use ($params) {
-                $q->where('nome', 'like', "%{$params['search']}%")
-                  ->orWhere('nome_modelo', 'like', "%{$params['search']}%");
+                $q->where('nome_modelo', 'like', "%{$params['search']}%")
+                  ->orWhere('posicionamento', 'like', "%{$params['search']}%");
             });
         }
 
@@ -48,8 +48,8 @@ class ModeloTecnicosRepository
 
         if (!empty($params['search'])) {
             $query->where(function ($q) use ($params) {
-                $q->where('nome', 'like', "%{$params['search']}%")
-                ->orWhere('nome_modelo', 'like', "%{$params['search']}%");
+                $q->where('nome_modelo', 'like', "%{$params['search']}%")
+                ->orWhere('posicionamento', 'like', "%{$params['search']}%");
             });
         }
 
@@ -78,8 +78,8 @@ class ModeloTecnicosRepository
 
         if (!empty($params['search'])) {
             $query->where(function ($q) use ($params) {
-                $q->where('nome', 'like', "%{$params['search']}%")
-                ->orWhere('nome_modelo', 'like', "%{$params['search']}%");
+                $q->where('nome_modelo', 'like', "%{$params['search']}%")
+                ->orWhere('posicionamento', 'like', "%{$params['search']}%");
             });
         }
 
