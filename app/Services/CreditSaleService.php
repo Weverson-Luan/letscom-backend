@@ -68,15 +68,17 @@ class CreditSaleService
             DB::beginTransaction();
 
 
-            $user = auth()->user();
-            $role = strtolower($user->roles()->first()?->nome ?? '');
+            $user = \Illuminate\Support\Facades\Auth::user();
 
-             if (in_array($role, ['admin', 'producao'])) {
+            $role = strtolower($user->roles->first()?->nome ?? '');
+
+            if (in_array($role, ['admin', 'producao'])) {
                 $data['status'] = 'confirmado';
-
             }
 
             $data['data_venda'] = now();
+            $data['valor'] = 0; // valor da unidade do crédito
+            $data['valor_total'] = 0; // valor da total dos crédito
 
             // ✅ Atualiza estoque do produto se fornecido produto_id
             if (!empty($data['produto_id']) && isset($data['quantidade_creditos'])) {
@@ -99,7 +101,6 @@ class CreditSaleService
 
             DB::commit();
             return $sale;
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Erro ao criar venda: ' . $e->getMessage());
@@ -125,12 +126,6 @@ class CreditSaleService
 
             DB::beginTransaction();
 
-            if (isset($data['quantidade_creditos']) &&
-                $data['quantidade_creditos'] != $creditSale->quantidade_creditos) {
-                $client = Client::findOrFail($creditSale->client_id);
-                $client->saldo_creditos = ($client->saldo_creditos - $creditSale->quantidade_creditos) + $data['quantidade_creditos'];
-                $client->save();
-            }
 
             $success = $this->repository->update($creditSale, $data);
 
@@ -182,18 +177,16 @@ class CreditSaleService
             DB::beginTransaction();
 
             $creditSale->update([
-            'status' => 'cancelado',
-            'quantidade_creditos' => 0
+                'status' => 'cancelado',
+                'quantidade_creditos' => 0
             ]);
 
             DB::commit();
             return true;
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Erro ao cancelar venda: ' . $e->getMessage());
             throw $e;
         }
     }
-
 }

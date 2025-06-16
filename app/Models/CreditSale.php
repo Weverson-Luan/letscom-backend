@@ -18,6 +18,7 @@ class CreditSale extends Model
         'user_id_executor',
         'produto_id',
         'valor',
+        'valor_total',
         'quantidade_creditos',
         'tipo_transacao',
         'status',
@@ -33,7 +34,7 @@ class CreditSale extends Model
 
     public function client()
     {
-        return $this->belongsTo(Client::class);
+        return $this->belongsTo(User::class);
     }
 
     public function executor()
