@@ -60,16 +60,15 @@ class User extends Authenticatable
     public function roles(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'role_user', 'user_id', 'role_id');
-
     }
 
-     /**
+    /**
      * Clientes atendidos por este consultor.
      */
     public function clientes(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(User::class, 'cliente_consultor', 'consultor_id', 'cliente_id')
-                    ->withTimestamps();
+            ->withTimestamps();
     }
 
     /**
@@ -78,7 +77,7 @@ class User extends Authenticatable
     public function consultores(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(User::class, 'cliente_consultor', 'cliente_id', 'consultor_id')
-                    ->withTimestamps();
+            ->withTimestamps();
     }
 
     /**
@@ -87,7 +86,7 @@ class User extends Authenticatable
     public function produtosVinculados(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'produtos_vinculados_usuarios', 'cliente_id', 'produto_id')
-                    ->withTimestamps();
+            ->withTimestamps();
     }
 
     /**
@@ -95,8 +94,23 @@ class User extends Authenticatable
      */
     public function tiposEntrega()
     {
-        return $this->belongsToMany(TipoEntrega::class, 'tipo_entrega_user', 'cliente_id', 'tipo_entrega_id')
-                    ->withTimestamps();
+        return $this->belongsToMany(TipoEntrega::class, 'tipo_entrega_user', 'tipo_entrega_id')
+            ->withTimestamps();
     }
 
+    /**
+     * Entregas em que este usuário é o cliente (destinatário).
+     */
+    public function entregasRecebidas()
+    {
+        return $this->hasMany(TipoEntregaUser::class, 'cliente_id');
+    }
+
+    /**
+     * Entregas em que este usuário foi o executor (quem liberou).
+     */
+    public function entregasLiberadas()
+    {
+        return $this->hasMany(TipoEntregaUser::class, 'user_executor_id');
+    }
 }

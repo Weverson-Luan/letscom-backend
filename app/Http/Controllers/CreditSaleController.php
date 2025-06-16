@@ -121,6 +121,19 @@ class CreditSaleController extends Controller
         }
     }
 
+     public function cancelVendaCreditos($id)
+    {
+        try {
+            $creditSale = CreditSale::findOrFail($id);
+
+            $this->service->cancel($creditSale);
+
+            return CreditsSalesResponseHelper::jsonSuccess('Venda cancelada com sucesso');
+        } catch (\Exception $e) {
+            return CreditsSalesResponseHelper::jsonError($e->getMessage());
+        }
+    }
+
     /**
      * Remove uma venda
      *

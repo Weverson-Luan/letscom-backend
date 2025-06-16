@@ -45,7 +45,7 @@ class CreditsSalesResponseHelper
                 'user_id' => $vendasCreditos['user_id'],
                 'status' => $vendasCreditos['status'],
                 'valor' => $vendasCreditos['valor'],
-                "quantidade_creditos" => $vendasCreditos["quantidade_creditos"],
+                'quantidade_creditos' => self::formatarValor($vendasCreditos["quantidade_creditos"]),
                 'data_venda'=> $vendasCreditos["data_venda"],
                 'tipo_transacao'=> $vendasCreditos["tipo_transacao"],
                 'produto'=> $vendasCreditos["produto"],
@@ -56,5 +56,10 @@ class CreditsSalesResponseHelper
                 'deleted_at' => $vendasCreditos['deleted_at'],
             ];
         }, $vendasCreditos);
+    }
+
+   public static function formatarValor($valor)
+    {
+        return fmod($valor, 1) == 0.0 ? (int) $valor : number_format($valor, 2, '.', '');
     }
 }

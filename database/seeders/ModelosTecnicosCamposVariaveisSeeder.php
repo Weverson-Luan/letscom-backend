@@ -16,44 +16,10 @@ class ModelosTecnicosCamposVariaveisSeeder extends Seeder
                 'modelo_tecnico_id' => 1,
                 'nome' => 'cpf',
                 'obrigatorio' => true,
+                'ordem' => 0,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ],
-            // [
-            //     'modelo_tecnico_id' => 2,
-            //     'nome' => 'nome_completo',
-            //     'obrigatorio' => false,
-            //     'created_at' => Carbon::now(),
-            //     'updated_at' => Carbon::now(),
-            // ],
-            // [
-            //     'modelo_tecnico_id' => 2,
-            //     'nome' => 'cargo',
-            //     'obrigatorio' => false,
-            //     'created_at' => Carbon::now(),
-            //     'updated_at' => Carbon::now(),
-            // ],
-            // [
-            //     'modelo_tecnico_id' => 2,
-            //     'nome' => 'admissao',
-            //     'obrigatorio' => false,
-            //     'created_at' => Carbon::now(),
-            //     'updated_at' => Carbon::now(),
-            // ],
-            // [
-            //     'modelo_tecnico_id' => 2,
-            //     'nome' => 'qr_code',
-            //     'obrigatorio' => false,
-            //     'created_at' => Carbon::now(),
-            //     'updated_at' => Carbon::now(),
-            // ],
-            // [
-            //     'modelo_tecnico_id' => 2,
-            //     'nome' => 'ige_a_abelha',
-            //     'obrigatorio' => false,
-            //     'created_at' => Carbon::now(),
-            //     'updated_at' => Carbon::now(),
-            // ],
         ]);
     }
 }

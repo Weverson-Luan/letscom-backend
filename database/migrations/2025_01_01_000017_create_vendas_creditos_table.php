@@ -15,11 +15,12 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id_executor');
             $table->unsignedBigInteger('produto_id');
 
-            $table->decimal('valor', 10, 2);
+            $table->decimal('valor', 10, 2); // alterar para valor_credito
             $table->decimal('quantidade_creditos', 10, 2);
-            $table->enum('status', ['pendente', 'confirmado', 'cancelado'])->default('pendente');
+            $table->enum('status', ['pendente', 'confirmado', 'cancelada'])->default('pendente');
             $table->timestamp('data_venda');
             $table->enum('tipo_transacao', ['entrada', 'saida'])->default("saida")->nullable();
+            $table->decimal('valor_total', 10, 2); // dos crédito
             $table->text('observacao')->nullable();
             $table->timestamps();
             $table->softDeletes();

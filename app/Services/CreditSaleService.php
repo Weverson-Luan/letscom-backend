@@ -67,7 +67,15 @@ class CreditSaleService
         try {
             DB::beginTransaction();
 
-            // $data['status'] = 'confirmado';
+
+            $user = auth()->user();
+            $role = strtolower($user->roles()->first()?->nome ?? '');
+
+             if (in_array($role, ['admin', 'producao'])) {
+                $data['status'] = 'confirmado';
+
+            }
+
             $data['data_venda'] = now();
 
             // ✅ Atualiza estoque do produto se fornecido produto_id
@@ -98,6 +106,8 @@ class CreditSaleService
             throw $e;
         }
     }
+
+
     /**
      * Atualiza uma venda existente
      *
@@ -150,12 +160,6 @@ class CreditSaleService
 
             DB::beginTransaction();
 
-            if ($creditSale->status === 'confirmado') {
-                $client = Client::findOrFail($creditSale->client_id);
-                $client->saldo_creditos -= $creditSale->quantidade_creditos;
-                $client->save();
-            }
-
             $success = $this->repository->delete($creditSale);
 
             DB::commit();
@@ -167,4 +171,29 @@ class CreditSaleService
             throw $e;
         }
     }
+
+    public function cancel(CreditSale $creditSale): bool
+    {
+        try {
+            if ($creditSale->status !== 'confirmado') {
+                throw new \Exception('Apenas vendas confirmadas podem ser canceladas');
+            }
+
+            DB::beginTransaction();
+
+            $creditSale->update([
+            'status' => 'cancelado',
+            'quantidade_creditos' => 0
+            ]);
+
+            DB::commit();
+            return true;
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Erro ao cancelar venda: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
 }

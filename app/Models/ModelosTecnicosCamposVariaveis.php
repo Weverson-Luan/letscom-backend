@@ -15,6 +15,7 @@ class ModelosTecnicosCamposVariaveis extends Model
         'modelo_tecnico_id',
         'nome',
         'obrigatorio',
+        'ordem'
     ];
 
     /**

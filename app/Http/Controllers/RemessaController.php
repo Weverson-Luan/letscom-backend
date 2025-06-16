@@ -101,7 +101,7 @@ class RemessaController extends Controller
             $data = RemessasResponseHelper::mapRemessas($remessasPaginadas->items());
 
             return RemessasResponseHelper::jsonSuccess(
-                'Minhas em expedições carregadas com sucesso!',
+                'Minhas expedições carregadas com sucesso!',
                 $data,
                 [
                     'current_page' => $remessasPaginadas->currentPage(),
@@ -113,6 +113,29 @@ class RemessaController extends Controller
         } catch (\Throwable $e) {
             Log::error('Erro ao listar minhas remessas em expedições: ' . $e->getMessage());
             return RemessasResponseHelper::jsonError("Erro ao listar minhas remessas em expedições!");
+        }
+    }
+
+    public function tarefasBalcao(Request $request): JsonResponse
+    {
+        try {
+            $remessasPaginadas = $this->service->listarTarefasEmExpedicao($request->all());
+
+            $data = RemessasResponseHelper::mapRemessas($remessasPaginadas->items());
+
+            return RemessasResponseHelper::jsonSuccess(
+                'Remessas balcão carregadas com sucesso!',
+                $data,
+                [
+                    'current_page' => $remessasPaginadas->currentPage(),
+                    'last_page' => $remessasPaginadas->lastPage(),
+                    'per_page' => $remessasPaginadas->perPage(),
+                    'total' => $remessasPaginadas->total(),
+                ]
+            );
+        } catch (\Throwable $e) {
+            Log::error('Erro ao listar minhas remessas balcão: ' . $e->getMessage());
+            return RemessasResponseHelper::jsonError("Erro ao listar minhas remessas balcão!");
         }
     }
 
@@ -141,18 +164,19 @@ class RemessaController extends Controller
 
             $data = $request->all();
 
-        //    // Apenas define o executor se ainda não foi atribuído
-        //     if (is_null($remessa->user_id_executor)) {
-        //         $data['user_id_executor'] = $userIdExecutouTarefa;
-        //     } else {
-        //         $data['user_id_executor'] = $remessa->user_id_executor; // mantém o valor original
-        //     }
+            //    // Apenas define o executor se ainda não foi atribuído
+            //     if (is_null($remessa->user_id_executor)) {
+            //         $data['user_id_executor'] = $userIdExecutouTarefa;
+            //     } else {
+            //         $data['user_id_executor'] = $remessa->user_id_executor; // mantém o valor original
+            //     }
 
-            $success = $this->service->update($remessa, $data);
+            $this->service->update($remessa, $data);
 
             return RemessasResponseHelper::jsonCriacaoSuccess(
-                'Remessa atualizada com sucesso!',[$remessa]
-             );
+                'Remessa atualizada com sucesso!',
+                [$remessa]
+            );
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return RemessasResponseHelper::jsonError('Remessa não encontrada.', 422);
         } catch (\Exception $e) {
@@ -165,6 +189,7 @@ class RemessaController extends Controller
         }
     }
 
+
     public function destroy(Remessa $remessa): JsonResponse
     {
         try {
@@ -174,5 +199,4 @@ class RemessaController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-
 }

@@ -13,8 +13,8 @@ class UsersResponseHelper
 
             // buscando dados de créditos de cada cliente
             $creditSales = \App\Models\CreditSale::where('cliente_id', $user['id'])
-            ->where('status', 'confirmado')
-            ->get();
+                ->where('status', 'confirmado')
+                ->get();
 
             // buscando apenas as transações do tipo de entrada
             $entradas = $creditSales->where('tipo_transacao', 'entrada')->sum('quantidade_creditos');
@@ -32,10 +32,6 @@ class UsersResponseHelper
             $user['designer'] = isset($user['user_id_executor'])
                 ? \App\Models\User::find($user['user_id_executor'])
                 : null;
-
-            $user['tipos_entrega'] = \App\Models\TipoEntrega::where('cliente_id', $user['id'])
-            ->get()
-            ->makeHidden(['pivot', 'user_id'])->first();
 
             // buscando dados do produto vinculado ao usuários
             $userModel = \App\Models\User::find($user['id']);

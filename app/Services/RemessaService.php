@@ -102,11 +102,6 @@ class RemessaService
         }
     }
 
-    public function listBySituacao(array $params): LengthAwarePaginator
-    {
-        return $this->repository->findBySituacaoPaginate($params);
-    }
-
     public function listarDisponiveisParaProducao(array $params)
     {
         return $this->repository->getRemessasDisponiveisParaProducao($params);
@@ -120,5 +115,10 @@ class RemessaService
     public function listarTarefasEmExpedicao(array $params)
     {
         return $this->repository->getRemessasEmExpedicoes($params);
+    }
+
+    public function listarTarefasBalcao(array $params)
+    {
+        return $this->repository->getRemessasBalcao($params);
     }
 }
