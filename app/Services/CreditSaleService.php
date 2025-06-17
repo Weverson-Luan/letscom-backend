@@ -169,14 +169,14 @@ class CreditSaleService
     public function cancel(CreditSale $creditSale): bool
     {
         try {
-            if ($creditSale->status !== 'confirmado') {
-                throw new \Exception('Apenas vendas confirmadas podem ser canceladas');
+            if ($creditSale->status !== 'confirmado' && $creditSale->status !== 'pendente') {
+                throw new \Exception('Apenas vendas com status "confirmado" ou "pendente" podem ser canceladas.');
             }
 
             DB::beginTransaction();
 
             $creditSale->update([
-                'status' => 'cancelado',
+                'status' => 'cancelada',
                 'quantidade_creditos' => 0
             ]);
 

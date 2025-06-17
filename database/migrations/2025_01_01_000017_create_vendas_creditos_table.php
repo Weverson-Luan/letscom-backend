@@ -17,7 +17,7 @@ return new class extends Migration
 
             $table->decimal('valor', 10, 2); // alterar para valor_credito
             $table->decimal('quantidade_creditos', 10, 2);
-            $table->enum('status', ['pendente', 'confirmado', 'cancelada'])->default('pendente');
+            $table->enum('status', ['pendente', 'confirmado', 'cancelada', 'cancelado'])->default('pendente');
             $table->timestamp('data_venda');
             $table->enum('tipo_transacao', ['entrada', 'saida'])->default("saida")->nullable();
             $table->decimal('valor_total', 10, 2); // dos crédito
