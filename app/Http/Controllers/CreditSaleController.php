@@ -45,10 +45,10 @@ class CreditSaleController extends Controller
             $vendasCredito = CreditsSalesResponseHelper::mapVendasCredito($response['data']);
 
             return CreditsSalesResponseHelper::jsonSuccess(
-                    'Histórico de transações carregadas com sucesso!',
-                    $vendasCredito,
-                    $response['pagination']
-                );
+                'Histórico de transações carregadas com sucesso!',
+                $vendasCredito,
+                $response['pagination']
+            );
             return response()->json($result);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
@@ -67,10 +67,10 @@ class CreditSaleController extends Controller
             $vendasCredito = CreditsSalesResponseHelper::mapVendasCredito($transacoes->items());
 
             return CreditsSalesResponseHelper::jsonSuccess(
-                    'Histórico de transações carregadas com sucessos!',
-                    $vendasCredito,
-                    $transacoes['pagination']
-                );
+                'Histórico de transações carregadas com sucessos!',
+                $vendasCredito,
+                $transacoes['pagination']
+            );
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
@@ -114,14 +114,17 @@ class CreditSaleController extends Controller
     public function update(CreditSaleRequest $request, CreditSale $creditSale): JsonResponse
     {
         try {
-            $success = $this->service->update($creditSale, $request->validated());
+
+            $bodyVendaCredito = $request->all();
+
+            $success = $this->service->update($creditSale, $bodyVendaCredito);
             return response()->json(['success' => $success]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
-     public function cancelVendaCreditos($id)
+    public function cancelVendaCreditos($id)
     {
         try {
             $creditSale = CreditSale::findOrFail($id);

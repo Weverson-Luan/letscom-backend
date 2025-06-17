@@ -120,12 +120,11 @@ class CreditSaleService
     public function update(CreditSale $creditSale, array $data): bool
     {
         try {
-            if ($creditSale->status === 'confirmado') {
+            if ($creditSale->status === 'confirmado' || $creditSale->status === 'cancelado') {
                 throw new \Exception('Não é possível alterar uma venda já confirmada');
             }
 
             DB::beginTransaction();
-
 
             $success = $this->repository->update($creditSale, $data);
 
