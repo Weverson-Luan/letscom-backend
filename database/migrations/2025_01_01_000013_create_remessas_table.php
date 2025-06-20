@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('tecnologia_id'); // tecnologia da remessa
 
             $table->integer('total_solicitacoes')->default(0);
-            $table->enum('situacao', ['solicitado','pendente','pedido_liberado','em_producao','pronto para imprimir','concluida','cancelada','error','duplicidade','a fazer','a aprovar','enviar pdf'])->default('solicitado');
+            $table->enum('situacao', ['solicitado', 'pendente', 'pedido_liberado', 'em_producao', 'pronto para imprimir', 'concluida', 'cancelada', 'concluido', 'error', 'duplicidade', 'a fazer', 'a aprovar', 'enviar pdf'])->default('solicitado');
             $table->string("status")->default("solicitado");
             $table->boolean('ativo')->default(true);
             $table->string("observacao")->nullable();
@@ -33,7 +33,7 @@ return new class extends Migration
             $table->softDeletes();
 
             // 🔗 Relacionamentos
-            $table->foreign('cliente_id')->references('id')->on('users')->onDelete('cascade');// qual cliente pertece essa remessa
+            $table->foreign('cliente_id')->references('id')->on('users')->onDelete('cascade'); // qual cliente pertece essa remessa
             $table->foreign('user_id_solicitante_remessa')->references('id')->on('users')->onDelete('cascade'); // quem que solicitou a remessa dentro do sistema
             $table->foreign('user_id_executor')->references('id')->on('users')->onDelete('cascade'); // reponsável por pegar a remessa para produzir
             $table->foreign('modelo_tecnico_id')->references('id')->on('modelos_tecnicos')->onDelete('cascade'); // modelo que o deve ser feito o crachá
