@@ -80,7 +80,7 @@ class UserSeeder extends Seeder
             ],
             [
                 'nome' => 'Ana Sousa',
-                'email' => 'anasousa@example.com',
+                'email' => 'anaamorim@example.com',
                 'senha' => 'expedicao123',
                 'role' => 'Expedicao',
                 'descricao_role' => 'Responsável por dispensar remessas e encaminhá-las para recepção.',

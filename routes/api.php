@@ -104,14 +104,14 @@ Route::middleware(['auth.jwt'])->group(function () {
      */
     Route::prefix('remessas')->group(function () {
         // 👤 Cliente: Cria remessa e consulta status
-        Route::get('/', [RemessaController::class, 'index'])->middleware('role:cliente,admin,producao,expedicao');
+        Route::get('/', [RemessaController::class, 'index'])->middleware('role:cliente,admin,producao,expedicao,recepcao');
         Route::post('/', [RemessaController::class, 'store'])->middleware('role:cliente,admin');
 
         // Usuários com acesso para produzir
         Route::get('/tarefas-disponiveis', [RemessaController::class, 'tarefasDisponiveis'])->middleware('role:admin,producao');
         Route::get('/minhas-tarefas', [RemessaController::class, 'minhasTarefas'])->middleware('role:admin,producao,expedicao');
         Route::get('/tarefas-expedicoes', [RemessaController::class, 'tarefasEmExpedicao'])->middleware('role:admin,expedicao');
-        Route::get('/tarefas-balcao', [RemessaController::class, 'tarefasBalcao'])->middleware('role:admin,recepcao');
+        Route::get('/tarefas-balcao', [RemessaController::class, 'tarefasBalcao'])->middleware('role:admin,recepcao,expedicao');
 
         // 📷 Uploads (liberado para admin e produção se necessário)
         Route::post('/{remessa}/upload-fotos', [RemessaFotoController::class, 'store'])->middleware('role:admin,producao');
@@ -119,7 +119,7 @@ Route::middleware(['auth.jwt'])->group(function () {
 
 
         // 📄 Detalhes da remessa
-        Route::get('/{remessa}', [RemessaController::class, 'show'])->middleware('role:admin,producao,cliente');
+        Route::get('/{remessa}', [RemessaController::class, 'show'])->middleware('role:admin,producao,recepcao,expedicao,cliente');
 
         // ✏️ Atualização e exclusão (restrito a admin)
         Route::put('/{id}', [RemessaController::class, 'update'])->middleware('role:admin,producao,expedicao');

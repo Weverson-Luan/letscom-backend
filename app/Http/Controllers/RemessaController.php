@@ -119,7 +119,7 @@ class RemessaController extends Controller
     public function tarefasBalcao(Request $request): JsonResponse
     {
         try {
-            $remessasPaginadas = $this->service->listarTarefasEmExpedicao($request->all());
+            $remessasPaginadas = $this->service->listarTarefasBalcao($request->all());
 
             $data = RemessasResponseHelper::mapRemessas($remessasPaginadas->items());
 
