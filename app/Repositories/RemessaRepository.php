@@ -222,7 +222,7 @@ class RemessaRepository
 
         $query = $this->model
             ->with(['tecnologia', 'modeloTecnico', 'cliente'])
-            ->where('situacao', 'concluida')
+            ->where('situacao', 'conferido')
             ->where('status', 'conferido')
             ->whereNotNull('user_id_executor');
 
