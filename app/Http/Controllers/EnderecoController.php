@@ -17,41 +17,41 @@ class EnderecoController extends Controller
         $this->service = $service;
     }
 
-    public function index(Request $request):JsonResponse
+    public function index(Request $request): JsonResponse
     {
 
-    $enderecos = $this->service->getAll($request->all());
+        $enderecos = $this->service->getAll($request->all());
 
 
-    return EnderecoResponseHelper::jsonSuccess(
-    'Lista paginada de endereços',
-    EnderecoResponseHelper::mapEnderecos($enderecos['data']),
-    [
-        'current_page' => $enderecos['pagination']['current_page'],
-        'last_page' => $enderecos['pagination']['last_page'],
-        'per_page' => $enderecos['pagination']['per_page'],
-        'total' => $enderecos['pagination']['total'],
-    ]
-    );
+        return EnderecoResponseHelper::jsonSuccess(
+            'Lista paginada de endereços',
+            EnderecoResponseHelper::mapEnderecos($enderecos['data']),
+            [
+                'current_page' => $enderecos['pagination']['current_page'],
+                'last_page' => $enderecos['pagination']['last_page'],
+                'per_page' => $enderecos['pagination']['per_page'],
+                'total' => $enderecos['pagination']['total'],
+            ]
+        );
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-        'user_id' => 'required|integer|exists:users,id',
-        'logradouro' => 'required|string',
-        'numero' => 'required|string',
-        'complemento' => 'nullable|string',
-        'bairro' => 'required|string',
-        'cidade' => 'required|string',
-        'estado' => 'required|string',
-        'cep' => 'required|string',
-        'tipo_endereco' => 'required|string',
-        'usar_mesmo_endereco_cadastrado_na_empresa' => 'boolean',
-        'nome_responsavel' => 'required|string', // <- AQUI
-        'email' => 'required|email',
-        'setor' => 'required|string',
-        'telefone' => 'required|string',
+            'user_id' => 'required|integer|exists:users,id',
+            'logradouro' => 'required|string',
+            'numero' => 'required|string',
+            'complemento' => 'nullable|string',
+            'bairro' => 'required|string',
+            'cidade' => 'required|string',
+            'estado' => 'required|string',
+            'cep' => 'required|string',
+            'tipo_endereco' => 'required|string',
+            'usar_mesmo_endereco_cadastrado_na_empresa' => 'boolean',
+            'nome_responsavel' => 'required|string', // <- AQUI
+            'email' => 'required|email',
+            'setor' => 'required|string',
+            'telefone' => 'required|string',
         ]);
 
         return response()->json($this->service->create($data), 201);
@@ -91,14 +91,16 @@ class EnderecoController extends Controller
     public function update(Request $request, $id)
     {
         $data = $request->validate([
-            'logradouro' => 'required|string',
+            'logradouro' => 'nullable|string',
             'numero' => 'required|string',
             'complemento' => 'nullable|string',
-            'bairro' => 'required|string',
-            'cidade' => 'required|string',
-            'estado' => 'required|string',
-            'cep' => 'required|string',
-            'usar_mesmo_endereco_cadastrado_na_empresa' => 'boolean',
+            'bairro' => 'nullable|string',
+            'cidade' => 'nullable|string',
+            'estado' => 'nullable|string',
+            'cep' => 'nullable|string',
+            'nome_responsavel' => 'nullable|string',
+            "telefone" => "nullable|string",
+            "setor" => "nullable|string"
         ]);
 
         return response()->json($this->service->update($id, $data));

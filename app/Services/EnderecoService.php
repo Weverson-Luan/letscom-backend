@@ -16,17 +16,16 @@ class EnderecoService
 
     public function getAll(array $params): array
     {
-          $users = $this->repository->buscarTodosEnderecos($params);
-            return [
-                'data' => $users->items(),
-                'pagination' => [
-                    'current_page' => $users->currentPage(),
-                    'last_page' => $users->lastPage(),
-                    'per_page' => $users->perPage(),
-                    'total' => $users->total()
-                ]
-            ];
-
+        $users = $this->repository->buscarTodosEnderecos($params);
+        return [
+            'data' => $users->items(),
+            'pagination' => [
+                'current_page' => $users->currentPage(),
+                'last_page' => $users->lastPage(),
+                'per_page' => $users->perPage(),
+                'total' => $users->total()
+            ]
+        ];
     }
 
     public function getById($id)

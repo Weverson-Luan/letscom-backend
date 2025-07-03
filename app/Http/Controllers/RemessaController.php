@@ -7,12 +7,8 @@ use Illuminate\Http\JsonResponse;
 
 use Illuminate\Support\Facades\Log;
 use App\Models\Remessa;
-use App\Models\User;
-use App\Models\ModeloTecnico;
-use App\Models\UserCliente;
 use App\Services\RemessaService;
 use App\Helpers\RemessasResponseHelper;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 
 class RemessaController extends Controller
