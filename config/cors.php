@@ -22,6 +22,7 @@ return [
     'allowed_origins' => [
         'http://localhost:5173',
         'https://letscom-git-develop-weversonluans-projects.vercel.app',
+        "https://letscom-git-main-weversonluans-projects.vercel.app"
     ],
 
     'allowed_origins_patterns' => [],
