@@ -63,8 +63,8 @@ class UserSeeder extends Seeder
                 'telefone' => '31999999997',
             ],
             [
-                'nome' => ' Alice Piettri',
-                'email' => ' alicepiettri@letscom.com',
+                'nome' => 'Alice Piettri',
+                'email' => 'alicepiettri@letscom.com',
                 'senha' => 'producao123',
                 'role' => 'Producao',
                 'descricao_role' => 'Responsável por executar tarefas de produção e acompanhar remessas em andamento.',
@@ -79,7 +79,7 @@ class UserSeeder extends Seeder
                 'telefone' => '31999999996',
             ],
             [
-                'nome' => ' Ana Amorim',
+                'nome' => 'Ana Amorim',
                 'email' => 'anaamorim@example.com',
                 'senha' => 'expedicao123',
                 'role' => 'Expedicao',
