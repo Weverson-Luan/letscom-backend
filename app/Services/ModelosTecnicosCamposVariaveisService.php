@@ -48,30 +48,31 @@ class ModelosTecnicosCamposVariaveisService
     /**
      * Cria um novo campo variável
      */
-public function create(array $data): array
-{
-    $itensCriados = [];
+    public function create(array $data): array
+    {
+        $itensCriados = [];
 
-    $campos = $data['campos'] ?? [];
+        $campos = $data['campos'] ?? [];
 
-    foreach ($campos as $item) {
-        // Se foi enviado um ID e ele já existe, ignoramos
-        if (!empty($item['id'])) {
-            $existe = ModelosTecnicosCamposVariaveis::where('id', $item['id'])->exists();
-            if ($existe) {
-                continue; // já existe, pula para o próximo
+        foreach ($campos as $item) {
+            // Se foi enviado um ID e ele já existe, ignoramos
+            if (!empty($item['id'])) {
+                $existe = ModelosTecnicosCamposVariaveis::where('id', $item['id'])->exists();
+                if ($existe) {
+                    continue; // já existe, pula para o próximo
+                }
             }
+            //Cria apenas se não tem id ou não existe no banco
+            $itensCriados[] = ModelosTecnicosCamposVariaveis::create([
+                'modelo_tecnico_id' => $item['modelo_tecnico_id'],
+                'nome' => $item['nome'],
+                'obrigatorio' => $item['obrigatorio'] ?? false,
+                "ordem" => $item["ordem"] ?? 0,
+            ]);
         }
-        //Cria apenas se não tem id ou não existe no banco
-        $itensCriados[] = ModelosTecnicosCamposVariaveis::create([
-            'modelo_tecnico_id' => $item['modelo_tecnico_id'],
-            'nome' => $item['nome'],
-            'obrigatorio' => $item['obrigatorio'] ?? false,
-        ]);
-    }
 
-    return $itensCriados;
-}
+        return $itensCriados;
+    }
 
     /**
      * Atualiza um campo variável
@@ -82,12 +83,36 @@ public function create(array $data): array
         return $campo ? $this->repository->update($campo, $data) : false;
     }
 
+    private function reorganizarOrdem(int $modeloTecnicoId): void
+    {
+        $campos = ModelosTecnicosCamposVariaveis::where('modelo_tecnico_id', $modeloTecnicoId)
+            ->orderBy('ordem')
+            ->get();
+
+        foreach ($campos as $index => $campo) {
+            if ($campo->ordem !== $index) {
+                $campo->update(['ordem' => $index]);
+            }
+        }
+    }
+
     /**
      * Remove um campo variável
      */
     public function delete(int $id): bool
     {
         $campo = $this->repository->find($id);
-        return $campo ? $this->repository->delete($campo) : false;
+
+        if (!$campo) {
+            return false;
+        }
+
+        $modeloTecnicoId = $campo->modelo_tecnico_id;
+
+        $this->repository->delete($campo);
+
+        $this->reorganizarOrdem($modeloTecnicoId);
+
+        return true;
     }
 }

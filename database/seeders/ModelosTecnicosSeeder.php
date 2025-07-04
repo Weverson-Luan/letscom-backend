@@ -17,9 +17,9 @@ class ModelosTecnicosSeeder extends Seeder
             [
                 'cliente_id' => 1,
                 'produto_id' => 1,
-                "tecnologia_id"=> 1,
+                "tecnologia_id" => 1,
+                'tipo_entrega_id' => 1,
                 'nome_modelo' => 'Visitante',
-                'tipo_entrega' => 'Normal',
                 'posicionamento' => 'horizontal',
                 'tem_furo' => false,
                 'tem_carga_foto' => false,
@@ -32,7 +32,5 @@ class ModelosTecnicosSeeder extends Seeder
                 'updated_at' => Carbon::now(),
             ],
         ]);
-
-
     }
 }

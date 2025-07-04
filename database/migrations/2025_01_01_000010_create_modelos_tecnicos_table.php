@@ -17,9 +17,9 @@ return new class extends Migration
             $table->unsignedBigInteger('cliente_id'); // qual cliente pertece esse modelo
             $table->unsignedBigInteger('produto_id');
             $table->unsignedBigInteger('tecnologia_id');
+            $table->unsignedBigInteger('tipo_entrega_id');
 
             $table->string('nome_modelo', 100)->nullable();
-            $table->string('tipo_entrega', 100)->nullable();
             $table->enum('posicionamento', ['horizontal', 'vertical'])->nullable();
             $table->boolean('tem_furo')->default(false);
             $table->boolean('tem_carga_foto')->default(false);
@@ -37,6 +37,7 @@ return new class extends Migration
             $table->foreign('cliente_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('produto_id')->references('id')->on('produtos')->onDelete('cascade');
             $table->foreign('tecnologia_id')->references('id')->on('tecnologias')->onDelete('cascade');
+            $table->foreign('tipo_entrega_id')->references('id')->on('tipos_entrega')->onDelete('cascade');
         });
     }
 

@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('cliente_consultor', function (Blueprint $table) {
             $table->id();
 
-             $table->unsignedBigInteger('cliente_id');   // usuario com papel "cliente"
-             $table->unsignedBigInteger('consultor_id'); // usuario com papel "consultor"
+            $table->unsignedBigInteger('cliente_id');   // usuario com papel "cliente"
+            $table->unsignedBigInteger('consultor_id'); // usuario com papel "consultor"
 
 
             $table->timestamps();

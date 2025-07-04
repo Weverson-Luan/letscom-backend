@@ -51,7 +51,7 @@ class Remessa extends Model
      */
     public function solicitanteRemessa()
     {
-        return $this->belongsTo(UsersSolicitanteRemessa::class, 'solicitante_remessa_user_id');
+        return $this->belongsTo(User::class, 'solicitante_remessa_user_id');
     }
 
     /**

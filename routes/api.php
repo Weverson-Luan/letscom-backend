@@ -22,6 +22,8 @@ use App\Http\Controllers\TecnologiasController;
 use App\Http\Controllers\EntregaClienteController;
 use App\Http\Controllers\ProdutoUsuarioController;
 use App\Http\Controllers\TipoEntregaUserController;
+use App\Http\Controllers\RemessaLiberadaController;
+
 /**
  * Rotas da API do Sistema de Gerenciamento de Créditos
  *
@@ -48,6 +50,13 @@ Route::post('/login', [AuthController::class, 'login'])->middleware(RateLimitPer
 Route::middleware(['auth.jwt'])->group(function () {
 
 
+    /**
+     * Rotas de Regras
+     * Gerenciamento completo de regras de usuários
+     *
+     * @prefix regras
+     * @middleware permission
+     */
     Route::prefix('roles')->group(function () {
         Route::get('/', [RoleController::class, 'index']);
         Route::post('/', [RoleController::class, 'store']);
@@ -76,14 +85,14 @@ Route::middleware(['auth.jwt'])->group(function () {
      * @middleware permission
      */
     Route::prefix('vendas_creditos')->group(function () {
-        Route::get('/', [CreditSaleController::class, 'index']);
-        Route::get('/cliente/{id}', [CreditSaleController::class, 'buscarTransacoesPorCliente']);
-        Route::post('/', [CreditSaleController::class, 'store']);
+        Route::get('/', [CreditSaleController::class, 'index'])->middleware('role:admin,producao');
+        Route::get('/cliente/{id}', [CreditSaleController::class, 'buscarTransacoesPorCliente'])->middleware('role:admin,producao,cliente');
+        Route::post('/', [CreditSaleController::class, 'store'])->middleware('role:admin,producao');
+        Route::post('{id}/cancelar', [CreditSaleController::class, 'cancelVendaCreditos'])->middleware('role:admin,producao');
         Route::get('/{creditSale}', [CreditSaleController::class, 'show']);
-        Route::put('/{creditSale}', [CreditSaleController::class, 'update']);
-        Route::delete('/{creditSale}', [CreditSaleController::class, 'destroy']);
+        Route::put('/{creditSale}', [CreditSaleController::class, 'update'])->middleware('role:admin,producao');
+        Route::delete('/{creditSale}', [CreditSaleController::class, 'destroy'])->middleware('role:admin,producao');
     });
-
 
 
     /**
@@ -94,35 +103,44 @@ Route::middleware(['auth.jwt'])->group(function () {
      * @middleware permission
      */
     Route::prefix('remessas')->group(function () {
-            // 👤 Cliente: Cria remessa e consulta status
-        Route::get('/', [RemessaController::class, 'index'])->middleware('role:cliente,admin,producao');
+        // 👤 Cliente: Cria remessa e consulta status
+        Route::get('/', [RemessaController::class, 'index'])->middleware('role:cliente,admin,producao,expedicao,recepcao');
         Route::post('/', [RemessaController::class, 'store'])->middleware('role:cliente,admin');
 
         // Usuários com acesso para produzir
         Route::get('/tarefas-disponiveis', [RemessaController::class, 'tarefasDisponiveis'])->middleware('role:admin,producao');
-        Route::get('/minhas-tarefas', [RemessaController::class, 'minhasTarefas']);
-        Route::get('/tarefas-expedicoes', [RemessaController::class, 'tarefasEmExpedicao'])->middleware('role:admin,producao');
+        Route::get('/minhas-tarefas', [RemessaController::class, 'minhasTarefas'])->middleware('role:admin,producao,expedicao');
+        Route::get('/tarefas-expedicoes', [RemessaController::class, 'tarefasEmExpedicao'])->middleware('role:admin,expedicao');
+        Route::get('/tarefas-balcao', [RemessaController::class, 'tarefasBalcao'])->middleware('role:admin,recepcao,expedicao');
+
         // 📷 Uploads (liberado para admin e produção se necessário)
         Route::post('/{remessa}/upload-fotos', [RemessaFotoController::class, 'store'])->middleware('role:admin,producao');
         Route::post('/{remessa}/upload-planilha', [RemessaPlanilhaController::class, 'store'])->middleware('role:admin,producao');
 
 
         // 📄 Detalhes da remessa
-        Route::get('/{remessa}', [RemessaController::class, 'show'])->middleware('role:admin,cliente');
+        Route::get('/{remessa}', [RemessaController::class, 'show'])->middleware('role:admin,producao,recepcao,expedicao,cliente');
 
         // ✏️ Atualização e exclusão (restrito a admin)
-        Route::put('/{id}', [RemessaController::class, 'update'])->middleware('role:admin,producao');
+        Route::put('/{id}', [RemessaController::class, 'update'])->middleware('role:admin,producao,expedicao');
         Route::delete('/{remessa}', [RemessaController::class, 'destroy'])->middleware('role:admin');
-
-        // // 🚦 Transições de status protegidas por role específica
-        // Route::post('/{remessa}/produzir', [RemessaStatusController::class, 'produzir'])->middleware('role:producao');
-        // Route::post('/{remessa}/expedir', [RemessaStatusController::class, 'expedir'])->middleware('role:producao');
-        // Route::post('/{remessa}/liberar', [RemessaStatusController::class, 'liberar'])->middleware('role:expedicao');
-        // Route::post('/{remessa}/finalizar', [RemessaStatusController::class, 'finalizar'])->middleware('role:recepcao');
     });
 
 
-      /**
+    /**
+     * Rotas de liberação de remessas
+     * Gerenciamento de liberação remessas
+     *
+     * @prefix remessas
+     * @middleware permission
+     */
+    Route::prefix('liberar-remessa')->group(function () {
+        Route::post('/', [RemessaLiberadaController::class, 'liberarRemessa']);     // Liberar remessa
+        Route::get('/', [RemessaLiberadaController::class, 'remessasLiberadas']);      // Listar todas
+        Route::get('/{remessaId}', [RemessaLiberadaController::class, 'show']); // Buscar por remessa
+    });
+
+    /**
      * Rotas de Modelos
      * Gerenciamento de modelos
      *
@@ -131,8 +149,8 @@ Route::middleware(['auth.jwt'])->group(function () {
      */
     Route::prefix('modelo-tecnico')->group(function () {
         Route::get('/', [ModeloTecnicosController::class, 'index'])->middleware('role:admin,cliente,producao');
-        Route::get('/clientes/{id}', [ModeloTecnicosController::class, 'buscarPorUsuarios'])->middleware('role:admin,cliente,producao');
-        Route::get('/cliente/unico/{id}', [ModeloTecnicosController::class, 'buscarModeloUnico'])->middleware('role:admin,cliente,producao');
+        Route::get('/clientes/{id}', [ModeloTecnicosController::class, 'buscarPorUsuarios'])->middleware('role:admin,cliente,producao,expedicao');
+        Route::get('/cliente/unico/{id}', [ModeloTecnicosController::class, 'buscarModeloUnico'])->middleware('role:admin,cliente,producao,expedicao');
 
         Route::post('/', [ModeloTecnicosController::class, 'store'])->middleware('role:admin,cliente,producao');
         Route::get('/{id}', [ModeloTecnicosController::class, 'show']);
@@ -151,6 +169,7 @@ Route::middleware(['auth.jwt'])->group(function () {
     Route::prefix('modelos-tecnicos-campos-variaveis')->group(function () {
         Route::get('/', [ModelosTecnicosCamposVariaveisController::class, 'index']);
         Route::post('/', [ModelosTecnicosCamposVariaveisController::class, 'store'])->middleware('role:admin,cliente,producao');
+        Route::post('/reorganizar/{modelo_tecnico_id}', [ModelosTecnicosCamposVariaveisController::class, 'reorganizarOrdem']);
         Route::get('/{id}', [ModelosTecnicosCamposVariaveisController::class, 'show']);
         Route::put('/{id}', [ModelosTecnicosCamposVariaveisController::class, 'update'])->middleware('role:admin,cliente,producao');
         Route::delete('/{id}', [ModelosTecnicosCamposVariaveisController::class, 'destroy'])->middleware('role:admin,cliente,producao');
@@ -204,6 +223,14 @@ Route::middleware(['auth.jwt'])->group(function () {
         Route::delete('/{id}', [UserAtendimentoController::class, 'destroy']);
     });
 
+
+    /**
+     * Rotas de Usuários que fazem consultorias de vendas ao cliente
+     * Gerenciamento de  Usuários que fazem atendimentos (CRUD)
+     *
+     * @prefix users-atendimentos
+     * @middleware permission
+     */
     Route::prefix('usuarios-cliente')->group(function () {
         Route::get('/', [UserClienteController::class, 'index']);        // Listar todos
         Route::get('/{id}', [UserClienteController::class, 'show']);     // Detalhar um
@@ -214,9 +241,9 @@ Route::middleware(['auth.jwt'])->group(function () {
     });
 
 
-     /**
-     * Rotas de tipos de entregas
-     * Gerenciamento de tipos de entregas (CRUD)
+    /**
+     * Rotas de Tipos de entregas
+     * Gerenciamento de Tipos de entregas (CRUD)
      *
      * @prefix tipos-entrega
      * @middleware permission
@@ -232,7 +259,7 @@ Route::middleware(['auth.jwt'])->group(function () {
         Route::delete('/{id}', [TipoEntregaController::class, 'destroy']);
     });
 
-     /**
+    /**
      * Rotas de Endereços
      * Gerenciamento de endereços (CRUD)
      *
@@ -249,11 +276,11 @@ Route::middleware(['auth.jwt'])->group(function () {
     });
 
 
-     /**
-     * Rotas de Endereços
-     * Gerenciamento de endereços (CRUD)
+    /**
+     * Rotas de Tecnologias
+     * Gerenciamento de Tecnologias (CRUD)
      *
-     * @prefix enderecos
+     * @prefix tecnologias
      * @middleware permission
      */
     Route::prefix('tecnologias')->group(function () {
@@ -264,7 +291,7 @@ Route::middleware(['auth.jwt'])->group(function () {
         Route::delete('/{id}', [TecnologiasController::class, 'destroy']);
     });
 
-        /**
+    /**
      * Rotas de vincular produtos ao cliente
      * Gerenciamento de vincular produtos ao cliente (CRUD)
      *
@@ -278,12 +305,11 @@ Route::middleware(['auth.jwt'])->group(function () {
     });
 
 
-
-         /**
-     * Rotas de entreas
-     * Gerenciamento de entregas de remessas (CRUD)
+    /**
+     * Rotas de entrega cliente
+     * Gerenciamento de entrega cliente
      *
-     * @prefix enderecos
+     * @prefix entrega cliente
      * @middleware permission
      */
     Route::prefix('entregas-cliente')->group(function () {
@@ -293,7 +319,6 @@ Route::middleware(['auth.jwt'])->group(function () {
         Route::put('/{id}', [EntregaClienteController::class, 'update']);
         Route::delete('/{id}', [EntregaClienteController::class, 'destroy']);
     });
-
 });
 
 

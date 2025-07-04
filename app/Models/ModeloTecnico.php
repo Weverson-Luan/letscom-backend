@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -11,8 +12,8 @@ class ModeloTecnico extends Model
         'cliente_id',
         'produto_id',
         'tecnologia_id',
+        'tipo_entrega_id',
         'nome_modelo',
-        'tipo_entrega',
         "tipo_furo",
         'posicionamento',
         'tem_furo',
@@ -45,5 +46,10 @@ class ModeloTecnico extends Model
         // relacionamento com os campos variaveis o modelo tecnico tem muitos campos variaveis
         return $this->hasMany(\App\Models\ModelosTecnicosCamposVariaveis::class, 'modelo_tecnico_id');
     }
-}
 
+    public function tipoEntrega()
+    {
+        // relacionamento com modelo para que um modelo possar ter um tipo entrega
+        return $this->hasOne(\App\Models\TipoEntrega::class, 'tipo_entrega_id');
+    }
+}

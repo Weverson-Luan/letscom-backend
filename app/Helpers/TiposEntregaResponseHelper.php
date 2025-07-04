@@ -34,21 +34,17 @@ class TiposEntregaResponseHelper
     }
 
     public static function mapTiposEntrega(array|object $data): array
-{
-    return array_map(function ($item) {
-        // Garante que é um objeto (pode vir como array se for ->toArray())
-        $item = (object) $item;
+    {
+        return array_map(function ($item) {
+            // Garante que é um objeto (pode vir como array se for ->toArray())
+            $item = (object) $item;
 
-        return [
-            'id' => $item->id,
-            'tipo' => $item->tipo,
-            // 'cliente_id' => $item->cliente_id,
-            'endereco_entrega_id' => $item->endereco_entrega_id,
-            'created_at' => $item->created_at,
-            'updated_at' => $item->updated_at,
-            // 'deleted_at' => $item->deleted_at ?? null,
-        ];
-    }, is_array($data) ? $data : $data->toArray());
-}
-
+            return [
+                'id' => $item->id,
+                'tipo' => $item->tipo,
+                'created_at' => $item->created_at,
+                'updated_at' => $item->updated_at,
+            ];
+        }, is_array($data) ? $data : $data->toArray());
+    }
 }

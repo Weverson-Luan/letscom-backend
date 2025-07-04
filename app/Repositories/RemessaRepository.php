@@ -15,18 +15,26 @@ class RemessaRepository
     }
 
     /**
-     * Lista remessas com paginação e filtros
+     * Cria uma nova remessa
+     */
+    public function create(array $data): Remessa
+    {
+        return $this->model->create($data);
+    }
+
+
+    /**
+     * Busca remessas com paginação e filtros
      */
     public function paginate(array $params): LengthAwarePaginator
     {
         $query = $this->model->query();
 
-        $userAutenticado = auth()->user();
+        $userAutenticado = \Illuminate\Support\Facades\Auth::user();
 
 
         if ($userAutenticado) {
-            $role = strtolower($userAutenticado->roles()->first()?->nome ?? '');
-
+            $role = strtolower($userAutenticado->roles->first()?->nome ?? '');
             /**
              * USUÁRIO CLIENTE DEVE RETORNA TODAS REMESSAS
              */
@@ -36,15 +44,15 @@ class RemessaRepository
 
 
             /**
-             *  USUÁRIO VALIDAÇÕES ['expedição', 'produção', 'recepção']
+             *  USUÁRIO VALIDAÇÕES ['pedido_liberado', 'produção', 'recepção']
              */
-            if (in_array($role, ['expedição', 'produção', 'recepção'])) {
+            if (in_array($role, ['pedido_liberado', 'produção', 'recepção'])) {
 
                 /**
-                 * USUÁRIO PARA EXPEDIÇÃO DEVE RETORNA O STATUS ['expedição']
+                 * USUÁRIO PARA EXPEDIÇÃO DEVE RETORNA O STATUS ['pedido_liberado']
                  */
-                if ($role === 'expedição') {
-                    $query->where('situação', 'expedição');
+                if ($role === 'pedido_liberado') {
+                    $query->where('situação', 'pedido_liberado');
                 }
 
                 /**
@@ -61,7 +69,6 @@ class RemessaRepository
                     $query->where('situacao', 'pedido_liberado');
                 }
             }
-
         }
 
         return $query
@@ -74,13 +81,6 @@ class RemessaRepository
             ->paginate($params['per_page'] ?? 10);
     }
 
-    /**
-     * Cria uma nova remessa
-     */
-    public function create(array $data): Remessa
-    {
-        return $this->model->create($data);
-    }
 
     /**
      * Busca uma remessa pelo ID
@@ -108,10 +108,10 @@ class RemessaRepository
 
             if (!empty($search)) {
                 $q->where('situacao', 'like', "%{$search}%")
-                ->orWhere('id', $search)
-                ->orWhereHas('cliente', function ($query) use ($search) {
-                    $query->where('nome', 'like', "%{$search}%");
-                });
+                    ->orWhere('id', $search)
+                    ->orWhereHas('cliente', function ($query) use ($search) {
+                        $query->where('nome', 'like', "%{$search}%");
+                    });
             }
         });
 
@@ -127,7 +127,7 @@ class RemessaRepository
      */
     public function getMinhasTarefas(array $params)
     {
-        $userAutenticado = auth()->user();
+        $userAutenticado = \Illuminate\Support\Facades\Auth::user();
 
         $query = $this->model
             ->with(['tecnologia', 'modeloTecnico', 'cliente'])
@@ -138,7 +138,7 @@ class RemessaRepository
          * VALIDAÇÃO PARA SABER SE O USUÁRIO É ADMIN
          */
         if ($userAutenticado) {
-            $role = strtolower($userAutenticado->roles()->first()?->nome ?? '');
+            $role = strtolower($userAutenticado->roles->first()?->nome ?? '');
 
             // 🔒 Apenas restringe por executor se NÃO for admin
             if ($role !== 'admin') {
@@ -166,27 +166,33 @@ class RemessaRepository
             ->paginate($params['per_page'] ?? 10, ['*'], 'page', $params['page'] ?? 1);
     }
 
-     /**
+    /**
      * Busca remessas que estão em expedições
      */
     public function getRemessasEmExpedicoes(array $params)
     {
-        $userAutenticado = auth()->user();
+        $userAutenticado = \Illuminate\Support\Facades\Auth::user();
 
         $query = $this->model
-            ->with(['tecnologia', 'modeloTecnico', 'user'])
-            ->where('situacao', 'concluida') // ← adiciona esse filtro fixo
-            ->whereNotNull('user_id_executor'); // ← garante que só retorne tarefas já atribuídas
+            ->with(['tecnologia', 'modeloTecnico', 'cliente'])
+            ->where('situacao', 'pedido_liberado')
+            ->whereNotNull('user_id_executor');
 
         /**
-         * VALIDAÇÃO PARA SABER SE O USUÁRIO É ADMIN
+         * VALIDAÇÃO PARA PERMITIR APENAS ADMIN OU EXPEDIÇÃO
          */
         if ($userAutenticado) {
-            $role = strtolower($userAutenticado->roles()->first()?->nome ?? '');
+            $role = strtolower($userAutenticado->roles->first()?->nome ?? '');
 
-            // 🔒 Apenas restringe por executor se NÃO for admin
-            if ($role !== 'admin') {
-                $query->where('user_id_executor', $userAutenticado->id);
+            if (!in_array($role, ['admin', 'expedicao'])) {
+                // impede usuários não autorizados de acessarem os dados
+                $empty = new LengthAwarePaginator(
+                    collect([]), // dados
+                    0,           // total
+                    $params['per_page'] ?? 10,
+                    $params['page'] ?? 1
+                );
+                return $empty; // retorna coleção vazia
             }
         }
 
@@ -197,15 +203,60 @@ class RemessaRepository
             $q->where(function ($sub) use ($params) {
                 $sub->where('situacao', 'like', '%' . $params['search'] . '%')
                     ->orWhere('id', $params['search']) // busca direta por ID
-                    ->orWhereHas('user', function ($query) use ($params) {
+                    ->orWhereHas('cliente', function ($query) use ($params) {
                         $query->where('nome', 'like', '%' . $params['search'] . '%');
                     });
             });
         });
 
+        return $query->orderBy('created_at', 'desc')
+            ->paginate($params['per_page'] ?? 10, ['*'], 'page', $params['page'] ?? 1);
+    }
+
+    /**
+     * Busca remessas que estão prontas para entregar o cliente
+     */
+    public function getRemessasBalcao(array $params)
+    {
+        $userAutenticado = \Illuminate\Support\Facades\Auth::user();
+
+        $query = $this->model
+            ->with(['tecnologia', 'modeloTecnico', 'cliente'])
+            ->where('situacao', 'conferido')
+            ->where('status', 'conferido')
+            ->whereNotNull('user_id_executor');
+
         /**
-         * ORDENAÇÃO DO MAIS RECENTES PARA OS MAIS ANTIGOS
+         * VALIDAÇÃO PARA PERMITIR APENAS ADMIN OU RECEPCAO
          */
+        if ($userAutenticado) {
+            $role = strtolower($userAutenticado->roles->first()?->nome ?? '');
+
+            if (!in_array($role, ['admin', 'recepcao'])) {
+                // impede usuários não autorizados de acessarem os dados
+                $empty = new LengthAwarePaginator(
+                    collect([]), // dados
+                    0,           // total
+                    $params['per_page'] ?? 10,
+                    $params['page'] ?? 1
+                );
+                return $empty; // retorna coleção vazia
+            }
+        }
+
+        /**
+         * QUANDO FRONT END MANDAR O CAMPO SEARCH
+         */
+        $query->when(!empty($params['search']), function ($q) use ($params) {
+            $q->where(function ($sub) use ($params) {
+                $sub->where('situacao', 'like', '%' . $params['search'] . '%')
+                    ->orWhere('id', $params['search']) // busca direta por ID
+                    ->orWhereHas('cliente', function ($query) use ($params) {
+                        $query->where('nome', 'like', '%' . $params['search'] . '%');
+                    });
+            });
+        });
+
         return $query->orderBy('created_at', 'desc')
             ->paginate($params['per_page'] ?? 10, ['*'], 'page', $params['page'] ?? 1);
     }

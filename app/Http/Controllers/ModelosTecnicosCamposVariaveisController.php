@@ -33,7 +33,7 @@ class ModelosTecnicosCamposVariaveisController extends Controller
         }
     }
 
-   public function store(Request $request)
+    public function store(Request $request)
     {
         try {
             $result = $this->service->create($request->all());
@@ -45,8 +45,8 @@ class ModelosTecnicosCamposVariaveisController extends Controller
                 'data' => $result
             ]);
         } catch (\Throwable $e) {
-            \Log::error('Erro ao criar campos variáveis: ' . $e->getMessage());
-        // Tratamento de erro de chave estrangeira
+            Log::error('Erro ao criar campos variáveis: ' . $e->getMessage());
+            // Tratamento de erro de chave estrangeira
             if ($e->getCode() === '23000') {
                 return response()->json([
                     'code' => 400,
@@ -65,16 +65,7 @@ class ModelosTecnicosCamposVariaveisController extends Controller
             ], 500);
         }
     }
-    public function show(int $id): JsonResponse
-    {
-        try {
-            $campo = $this->service->find($id);
-            return ModelosTecnicosCamposResponseHelper::jsonSuccess('Campo encontrado com sucesso.', $campo);
-        } catch (\Throwable $e) {
-            Log::error('Erro ao exibir campo variável: ' . $e->getMessage());
-            return ModelosTecnicosCamposResponseHelper::jsonError('Erro ao exibir campo variável.');
-        }
-    }
+
 
     public function update(Request $request, int $id): JsonResponse
     {
@@ -87,14 +78,15 @@ class ModelosTecnicosCamposVariaveisController extends Controller
         }
     }
 
+
     public function destroy(int $id): JsonResponse
     {
         try {
             $success = $this->service->delete($id);
-            return ModelosTecnicosCamposResponseHelper::jsonSuccess('Campo removido com sucesso.', $success);
+            return ModelosTecnicosCamposResponseHelper::jsonSuccess('Campo removido com sucesso.', []);
         } catch (\Throwable $e) {
             Log::error('Erro ao excluir campo variável: ' . $e->getMessage());
-            return ModelosTecnicosCamposResponseHelper::jsonError('Erro ao excluir campo variável.');
+            return ModelosTecnicosCamposResponseHelper::jsonError($e->getMessage());
         }
     }
 }

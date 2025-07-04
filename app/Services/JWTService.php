@@ -11,11 +11,11 @@ class JWTService
     public function createToken(array $payload): string
     {
         $payload['iat'] = time();
-        $payload['exp'] = time() + (config('jwt.ttl') * 60);
-        
+        $payload['exp'] = time() + (24 * 60 * 60); // 24 horas
+
         return JWT::encode(
-            $payload, 
-            config('jwt.secret'), 
+            $payload,
+            config('jwt.secret'),
             config('jwt.algo')
         );
     }
@@ -29,8 +29,8 @@ class JWTService
         ]);
 
         return (array) JWT::decode(
-            $token, 
+            $token,
             new Key(config('jwt.secret'), config('jwt.algo'))
         );
     }
-} 
+}

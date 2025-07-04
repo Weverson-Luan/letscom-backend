@@ -42,7 +42,7 @@ class UserService
         }
     }
 
-        /**
+    /**
      * Lista usuários com paginação
      */
     public function listUsuariosConsultores(array $params): array
@@ -103,10 +103,10 @@ class UserService
                 $user->consultores()->syncWithoutDetaching([$consultorId]);
             }
 
-            // Relaciona ao tipo de entrega (tabela usuario_tipo_entrega)
-            if( $tipoEntregaId) {
-                $user->tiposEntrega()->syncWithoutDetaching([$tipoEntregaId]);
-            }
+            // // Relaciona ao tipo de entrega (tabela usuario_tipo_entrega)
+            // if( $tipoEntregaId) {
+            //     $user->tiposEntrega()->syncWithoutDetaching([$tipoEntregaId]);
+            // }
 
             return $user;
         } catch (\Exception $e) {
@@ -145,13 +145,13 @@ class UserService
         }
     }
 
-    /**
-     * Busca usuário com suas permissões
-     */
-    public function findWithPermissions($id): ?User
-    {
-        return $this->repository->findWithPermissions($id);
-    }
+    // /**
+    //  * Busca usuário com suas permissões
+    //  */
+    // public function findWithPermissions($id): ?User
+    // {
+    //     return $this->repository->findWithPermissions($id);
+    // }
 
 
     public function generateCpfToken(string $cpf): string

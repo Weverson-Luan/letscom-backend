@@ -155,7 +155,7 @@ public function login(Request $request)
             'sub' => $user->id,
             'email' => $user->email,
             'iat' => time(),
-            'exp' => time() + 60 * 60
+            'exp' => time() + 60 * 60 * 24 // 24 horas apos o login
         ], config('app.jwt_secret'), 'HS256');
     }
 

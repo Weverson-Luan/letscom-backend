@@ -14,15 +14,18 @@ return new class extends Migration
         Schema::create('tipo_entrega_user', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('cliente_id');// cliente que esse usuário vai atender
+            $table->unsignedBigInteger('cliente_id'); // cliente que esse usuário vai atender
+            $table->unsignedBigInteger('user_executor_id'); // cliente que esse usuário vai atender
             $table->unsignedBigInteger('tipo_entrega_id');
+            $table->string("observacao");
 
 
 
             $table->timestamps();
 
             // 🔗 Relacionamentos
-             $table->foreign('cliente_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('cliente_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('user_executor_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('tipo_entrega_id')->references('id')->on('tipos_entrega')->onDelete('cascade');
         });
     }
